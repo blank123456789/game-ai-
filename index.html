@@ -40,18 +40,17 @@
         </div>
         
         <canvas id="tictaccanvas" style="width:650px;height:500px;color:blue"></canvas>
-        <script>var canvas = document.getElementById("tictaccanvas");
-var ctx = canvas.getContext("2d");
-ctx.fillStyle = "#2F13B6";
-ctx.fillRect(0, 0, 600, 600);
-var imageObj = new Image();
+        <script>
+        var canvas = document.getElementById("tictaccanvas");
+          var context = canvas.getContext("2d");
+          var imageObj = new Image();
 
-  imageObj.onload = function() {
-    context.drawImage(imageObj,70,50);
-  };
-  imageObj.src="/game-ai-/images/tictactoe_board.png";
-  </script>
-        <img src="/game-ai-/images/tictactoe_o.png" class="o" style="width:100px;height:100px;"></img>
+          imageObj.onload = function() {
+          context.drawImage(imageObj,70,50);
+              };
+            imageObj.src="/game-ai-/images/tictactoe_board.png";
+            </script>
+           <img src="/game-ai-/images/tictactoe_o.png" class="o" style="width:100px;height:100px;"></img>
         <img src="/game-ai-/images/tictactoe_x.png" class="x" style="width:100px;height:100px;"></img>
         <img src="/game-ai-/images/tictactoe_board.png" class="board" style="width:400px;height:400px;"></img>
         
