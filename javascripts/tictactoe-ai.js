@@ -9,3 +9,8 @@ var imageObj = new Image();
   };
   imageObj.src="/game-ai-/images/tictactoe_board.png";
   
+var draw = function() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  imageObj.onload();
+}
+  
