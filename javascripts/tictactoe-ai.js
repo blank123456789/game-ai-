@@ -8,3 +8,4 @@ var imageObj = new Image();
     context.drawImage(imageObj,70,50);
   };
   imageObj.src="/game-ai-/images/tictactoe_board.png";
+  imageObj.width=imageObj.height=100;
