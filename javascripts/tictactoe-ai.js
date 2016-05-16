@@ -4,7 +4,7 @@ ctx.fillStyle = "#2F13B6";
 ctx.fillRect(0, 0, 600, 600);
 var imageObj = new Image();
 imageObj.src="/game-ai-/images/tictactoe_board.png";
-
+imageObj.width=50;
   imageObj.onload = function() {
     ctx.drawImage(imageObj,0,0);
   };
