@@ -12,6 +12,8 @@ var imageObj = new Image();
 var draw = function() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   imageObj.onload();
+  ctx.fillStyle = "#2F13B6";
+  ctx.fillRect(0, 0, 600, 600);
 }
 
 setInterval(draw,20);
