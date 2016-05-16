@@ -14,4 +14,4 @@ var draw = function() {
   imageObj.onload();
 }
 
-setInterval(draw,20)
+setInterval(draw,20);
