@@ -6,6 +6,6 @@ var imageObj = new Image();
 imageObj.src="/game-ai-/images/tictactoe_board.png";
 
   imageObj.onload = function() {
-    context.drawImage(imageObj,0,0);
+    ctx.drawImage(imageObj,0,0);
   };
   
