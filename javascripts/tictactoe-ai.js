@@ -5,7 +5,7 @@ ctx.fillRect(0, 0, 600, 600);
 var imageObj = new Image();
 
   imageObj.onload = function() {
+    imageObj.src="/game-ai-/images/tictactoe_board.png";
     context.drawImage(imageObj,20,50);
   };
-  imageObj.src="/game-ai-/images/tictactoe_board.png";
   
