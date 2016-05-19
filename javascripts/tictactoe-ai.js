@@ -6,11 +6,13 @@ var imageObj = new Image();
 imageObj.src="/game-ai-/images/tictactoe_board.png";
   imageObj.onload = function() {
     ctx.drawImage(imageObj,0,0,300,150)  };
-imageObj.src="/game-ai-/images/tictactoe_O.png";
-  imageObj.onload = function() {
-    ctx.drawImage(imageObj,0,0,100,100)
+var imageObj1 = new Image();
+imageObj1.src="/game-ai-/images/tictactoe_O.png";
+  imageObj1.onload = function() {
+    ctx.drawImage(imageObj1,0,0,100,100)
   };
-imageObj.src="/game-ai-/images/tictactoe_X.png";
-  imageObj.onload = function() {
-    ctx.drawImage(imageObj,160,160,100,100)
+var imageObj2 = new Image();
+imageObj2.src="/game-ai-/images/tictactoe_X.png";
+  imageObj2.onload = function() {
+    ctx.drawImage(imageObj2,160,160,100,100)
   };   
