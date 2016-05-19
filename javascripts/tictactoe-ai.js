@@ -8,6 +8,6 @@ imageObj.src="/game-ai-/images/tictactoe_board.png";
     ctx.drawImage(imageObj,0,0,300,150)
   };
   imageObj1.src="/game-ai-/images/tictactoe_O.png";
-  imageObj.onload = function() {
+  imageObj1.onload = function() {
     ctx.drawImage(imageObj1,0,0,100,100)
   };
