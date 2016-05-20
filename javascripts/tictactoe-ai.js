@@ -7,4 +7,4 @@ ctx.beginPath();
 ctx.fillStyle="#32EDF2";
 ctx.fillRect(5,5,100,100); 
 ctx.stroke();
-ctx.closePath
+ctx.closePath();
