@@ -8,5 +8,21 @@ combo.push(a,b)
 c.push(i*grid*i);
 d.push((grid-i-1)*grid+1);
 
- 
+function minimaxvalue(state){
+   if (state.isTerminal){
+     return Game.score(state)
+   }
+   var stateScore=
+   if(state.Turn=="X"){
+     return Game.score == 1000
+     else {
+       return State.score == -1000 
+    
+     }
+   }
+  
+     
+   }
+   
+ }
  
