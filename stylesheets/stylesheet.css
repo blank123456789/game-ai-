@@ -4,6 +4,7 @@
   height:100px;
   margin: 0px auto;
   border: 1px solid red;
+  z-index:4;
 }
 
 body {
