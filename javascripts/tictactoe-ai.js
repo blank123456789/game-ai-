@@ -18,13 +18,13 @@ ctx.stroke();
 ctx.beginPath();
 ctx.lineWidth="10";
 ctx.fillStyle="blue";
-ctx.fillRect(20,140,100,100);
+ctx.fillRect(140,20,100,100);
 ctx.stroke();
 
 ctx.beginPath();
 ctx.lineWidth="10";
 ctx.fillStyle="blue";
-ctx.fillRect(20,260,100,100);
+ctx.fillRect(260,140,100,100);
 ctx.stroke();
 
 ctx.beginPath();
@@ -37,4 +37,10 @@ ctx.beginPath();
 ctx.lineWidth="10";
 ctx.fillStyle="blue";
 ctx.fillRect(140,140,100,100);
+ctx.stroke();
+
+ctx.beginPath();
+ctx.lineWidth="10";
+ctx.fillStyle="blue";
+ctx.fillRect(260,140,100,100);
 ctx.stroke();
