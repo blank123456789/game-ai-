@@ -17,6 +17,7 @@ canvas.height = 100;
 canvas.style.border = "1px solid";
 canvas.style.position = "absolute";
 canvas.style.margin = "auto";
+canvas.setAttribute('style', "left: 0px;top: 0px;");
 var body = document.getElementsByTagName("body")[0];
 body.appendChild(canvas);
 
