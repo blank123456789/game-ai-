@@ -18,6 +18,12 @@ ctx.stroke();
 ctx.beginPath();
 ctx.lineWidth="10";
 ctx.strokeStyle="blue";
+ctx.rect(20,140,100,100);
+ctx.stroke();
+
+ctx.beginPath();
+ctx.lineWidth="10";
+ctx.strokeStyle="blue";
 ctx.rect(140,140,100,100);
 ctx.stroke();
 			
