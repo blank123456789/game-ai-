@@ -9,56 +9,16 @@ body.appendChild(canvas);
 c = document.getElementById("tictaccanvas");
 ctx = c.getContext("2d");
 
-ctx.beginPath();
-ctx.lineWidth="10";
-ctx.fillStyle="blue";
-ctx.fillRect(20,20,100,100);
-ctx.stroke();
+var drawTile = function(x,y) {
+  ctx.beginPath();
+  ctx.lineWidth="10";
+  ctx.fillStyle="blue";
+  ctx.fillRect(20,20,x,y);
+  ctx.stroke();
+}
 
-ctx.beginPath();
-ctx.lineWidth="10";
-ctx.fillStyle="blue";
-ctx.fillRect(140,20,100,100);
-ctx.stroke();
+var draw = function() {
+  drawTile(20,20);
+}
 
-ctx.beginPath();
-ctx.lineWidth="10";
-ctx.fillStyle="blue";
-ctx.fillRect(260,20,100,100);
-ctx.stroke();
-
-ctx.beginPath();
-ctx.lineWidth="10";
-ctx.fillStyle="blue";
-ctx.fillRect(20,140,100,100);
-ctx.stroke();
-
-ctx.beginPath();
-ctx.lineWidth="10";
-ctx.fillStyle="blue";
-ctx.fillRect(140,140,100,100);
-ctx.stroke();
-
-ctx.beginPath();
-ctx.lineWidth="10";
-ctx.fillStyle="blue";
-ctx.fillRect(260,140,100,100);
-ctx.stroke();
-
-ctx.beginPath();
-ctx.lineWidth="10";
-ctx.fillStyle="blue";
-ctx.fillRect(20,260,100,100);
-ctx.stroke();
-
-ctx.beginPath();
-ctx.lineWidth="10";
-ctx.fillStyle="blue";
-ctx.fillRect(140,260,100,100);
-ctx.stroke();
-
-ctx.beginPath();
-ctx.lineWidth="10";
-ctx.fillStyle="blue";
-ctx.fillRect(260,260,100,100);
-ctx.stroke();
+setInterval(draw,10)
