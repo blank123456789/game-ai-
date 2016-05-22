@@ -14,7 +14,7 @@ var canvas = document.createElement('canvas');
 canvas.id = "tictaccanvas";
 canvas.width = 600;
 canvas.height = 600;
-canvas.setAttribute('style', "position: absolute;  left: 50%;margin-left:-400px; top: 50%;margin-top:-300px; border:2px solid blue;z-index:4");
+canvas.setAttribute('style', "position: absolute;  left: 50%;top: 50%;border:2px solid blue;z-index:1");
 var body = document.getElementsByTagName("body")[0];
 body.appendChild(canvas);
 
