@@ -9,7 +9,13 @@ body.appendChild(canvas);
 c = document.getElementById("tictaccanvas");
 ctx = c.getContext("2d");
 
-var drawTile = function(x,y) {
+var drawTile = function(square) {
+  var square = function() {
+    if(square == "a1") {
+      var x = 20;
+      var y = 20;
+    }
+  }
   ctx.beginPath();
   ctx.lineWidth="10";
   ctx.fillStyle="blue";
@@ -18,11 +24,7 @@ var drawTile = function(x,y) {
 }
 
 var draw = function() {
-  for(var i; i<9; i++){
-    var x = (i)*120 + 20;
-    var y = (i)*120 + 20;
-  }
-  drawTile(x,y);
+  drawTile(a1);
     
 }
 
