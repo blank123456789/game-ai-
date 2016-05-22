@@ -14,13 +14,13 @@ var drawTile = function(square) {
     if(square == "a1") {
       var x = 20;
       var y = 20;
+      ctx.beginPath();
+      ctx.lineWidth="10";
+      ctx.fillStyle="blue";
+      ctx.fillRect(x,y,100,100);
+      ctx.stroke();
     }
   }
-  ctx.beginPath();
-  ctx.lineWidth="10";
-  ctx.fillStyle="blue";
-  ctx.fillRect(x,y,100,100);
-  ctx.stroke();
 }
 
 var draw = function() {
