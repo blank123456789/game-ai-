@@ -11,19 +11,19 @@ ctx = c.getContext("2d");
 
 ctx.beginPath();
 ctx.lineWidth="10";
-ctx.strokeStyle="blue";
+ctx.fillStyle="blue";
 ctx.fillRect(20,20,100,100);
 ctx.stroke();
 
 ctx.beginPath();
 ctx.lineWidth="10";
-ctx.strokeStyle="blue";
+ctx.fillStyle="blue";
 ctx.fillRect(20,140,100,100);
 ctx.stroke();
 
 ctx.beginPath();
 ctx.lineWidth="10";
-ctx.strokeStyle="blue";
+ctx.fillStyle="blue";
 ctx.fillRect(140,140,100,100);
 ctx.stroke();
 			
