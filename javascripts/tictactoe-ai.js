@@ -12,12 +12,9 @@ ctx.closePath();
 
 var canvas = document.createElement('canvas');
 canvas.id = "tictaccanvas";
-canvas.width = 100;
-canvas.height = 100;
-canvas.style.border = "1px solid";
-canvas.style.position = "absolute";
-canvas.style.margin = "auto";
-canvas.setAttribute('style', "left: 0px;top: 0px;");
+canvas.width = 600;
+canvas.height = 600;
+canvas.setAttribute('style', "position: absolute;  left: 50%;margin-left:-400px; top: 50%;margin-top:-300px; border:2px solid blue");
 var body = document.getElementsByTagName("body")[0];
 body.appendChild(canvas);
 
