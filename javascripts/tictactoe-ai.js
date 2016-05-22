@@ -12,8 +12,8 @@ ctx = c.getContext("2d");
 var drawTile = function(square) {
   var square = function() {
     if(square == "a1") {
-      var x = 20;
-      var y = 20;
+      x = 20;
+      y = 20;
       ctx.beginPath();
       ctx.lineWidth="10";
       ctx.fillStyle="blue";
