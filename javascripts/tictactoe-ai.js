@@ -5,6 +5,6 @@ ctx.fillRect(0, 0, 600, 600);
 
 ctx.beginPath();
 ctx.fillStyle="#32EDF2";
-ctx.fillRect(50,50,100,100); 
+ctx.fillRect(50,25,100,50); 
 ctx.stroke();
 ctx.closePath();
