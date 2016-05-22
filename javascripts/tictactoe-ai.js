@@ -10,12 +10,12 @@ ctx.stroke();
 ctx.closePath();
 */
 
-var _c = document.createElement("canvas");
-_c.width = _c.height = 100;
-var _ctx = _c.getContext("2d");
-_ctx.fillStyle = "#FFFFFF";
-document.body.appendChild(_c);
-
+var canvas = document.createElement('canvas');
+canvas.width = 100;
+canvas.height = 100;
+canvas.style.border = "1px solid";
+var body = document.getElementsByTagName("body")[0];
+body.appendChild(canvas);
 
 			
 
