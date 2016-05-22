@@ -9,5 +9,5 @@ ctx.fillRect(50,25,100,50);
 ctx.stroke();
 ctx.closePath();
 
-_ctx.arc(50, 50, 30, 0, 2*Math.PI);
+ctx.arc(50, 50, 30, 0, 2*Math.PI);
 
