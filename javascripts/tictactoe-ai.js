@@ -9,22 +9,18 @@ body.appendChild(canvas);
 c = document.getElementById("tictaccanvas");
 ctx = c.getContext("2d");
 
-var drawTile = function(square) {
-  var square = function() {
-    if(square == "a1") {
-      x = 20;
-      y = 20;
-      ctx.beginPath();
-      ctx.lineWidth="10";
-      ctx.fillStyle="blue";
-      ctx.fillRect(x,y,100,100);
-      ctx.stroke();
-    }
-  }
+var drawTile = function(x,y) {
+  ctx.beginPath();
+  ctx.lineWidth="10";
+  ctx.fillStyle="blue";
+  ctx.fillRect(x,y,100,100);
+  ctx.stroke();
 }
 
 var draw = function() {
-  drawTile(a1);
+  drawTile(20,20);
+  drawTile(140,20);
+  drawTile(260,20);
     
 }
 
