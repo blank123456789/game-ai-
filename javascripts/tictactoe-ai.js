@@ -13,7 +13,7 @@ var drawTile = function(x,y) {
   ctx.beginPath();
   ctx.lineWidth="10";
   ctx.fillStyle="blue";
-  ctx.fillRect(20,20,x,y);
+  ctx.fillRect(x,y,100,100);
   ctx.stroke();
 }
 
