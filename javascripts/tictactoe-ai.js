@@ -8,8 +8,11 @@ body.appendChild(canvas);
 
 c = document.getElementById("tictaccanvas");
 ctx = c.getContext("2d");
-ctx.fillStyle("#000000");
-ctx.fillRect(0,0,10,10);
 
+ctx.beginPath();
+ctx.lineWidth="10";
+ctx.strokeStyle="blue";
+ctx.rect(50,50,150,80);
+ctx.stroke();
 			
 
