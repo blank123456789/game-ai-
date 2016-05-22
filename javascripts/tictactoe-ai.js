@@ -6,5 +6,9 @@ canvas.setAttribute('style', "position:absolute;margin:auto;left:0%;top:25%;righ
 var body = document.getElementsByTagName("body")[0];
 body.appendChild(canvas);
 
+var c = canvas;
+c.fillStyle("#000000");
+c.fillRect(0,0,10,10);
+
 			
 
