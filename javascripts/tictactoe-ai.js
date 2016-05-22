@@ -20,10 +20,10 @@ var drawTile = function(x,y) {
 var draw = function() {
   for(var i; i<9; i++){
     var x = (i)*120 + 20;
-    var y = Math.floor(i)*120 + 20;
-    drawTile(x,y);
-    
+    var y = (i)*120 + 20;
   }
+  drawTile(x,y);
+    
 }
 
 setInterval(draw,10)
