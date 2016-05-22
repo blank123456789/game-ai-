@@ -18,7 +18,12 @@ var drawTile = function(x,y) {
 }
 
 var draw = function() {
-  drawTile(20,20);
+  for(var i; i<9; i++){
+    var x = (i % 3)*120 + 20;
+    var y = Math.floor(i/3)*120 + 20;
+    drawTile(x,y);
+    
+  }
 }
 
 setInterval(draw,10)
