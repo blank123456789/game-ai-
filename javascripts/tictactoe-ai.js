@@ -14,7 +14,7 @@ var _c = document.createElement("canvas");
 _c.width = _c.height = 100;
 var _ctx = _c.getContext("2d");
 _ctx.fillStyle = "#FFFFFF";
-document.body.appendChild(canvas);
+document.body.appendChild(_c);
 
 
 			
