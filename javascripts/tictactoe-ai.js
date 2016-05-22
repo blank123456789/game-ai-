@@ -19,8 +19,8 @@ var drawTile = function(x,y) {
 
 var draw = function() {
   for(var i; i<9; i++){
-    var x = (i % 3)*120 + 20;
-    var y = Math.floor(i/3)*120 + 20;
+    var x = (i)*120 + 20;
+    var y = Math.floor(i)*120 + 20;
     drawTile(x,y);
     
   }
