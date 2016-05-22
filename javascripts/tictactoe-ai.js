@@ -9,7 +9,7 @@ body.appendChild(canvas);
 c = document.getElementById("tictaccanvas");
 ctx = c.getContext("2d");
 ctx.fillStyle("#000000");
-ctx.rect(0,0,10,10);
+ctx.fillRect(0,0,10,10);
 
 			
 
