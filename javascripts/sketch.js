@@ -17,7 +17,7 @@ function setup() {
 
 }
 
-function newGame = function() {
+function newGame() {
 	location.reload();
 }
 
