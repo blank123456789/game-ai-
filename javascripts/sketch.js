@@ -1,6 +1,3 @@
-var centerx = (windowWidth - width) / 2;
-var centery = (windowHeight - height) / 2;
-
 function setup() {
   var board = createBoard(380,380);
   boardx = (windowWidth - width) / 2;
