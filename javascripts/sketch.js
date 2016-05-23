@@ -6,7 +6,7 @@ function setup() {
   boardy = ((windowHeight - height) / 2) + 100;
   board.position(boardx, boardy);
   board.mouseClicked(takeTurn);
-  player1_turn = turn;
+  player1_turn = true;
   turns = 0;
   var reloadButton = createButton("New Game");
   reloadButton.position(centerx - 11.5,centery - 75);
