@@ -7,9 +7,13 @@ function setup() {
   board.position(boardx, boardy);
   var reloadButton = createButton("New Game");
   reloadButton.position(centerx,centery - 100);
-  
-  
+  reloadButton.mouseClicked(newGame);
 }
+
+var newGame = function() {
+	location.reload();
+}
+
 function createBoard(x,y){
 	var board = createCanvas(x,y);
 	background(255)
