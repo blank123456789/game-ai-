@@ -57,8 +57,7 @@ function takeTurn() {
 	}
 }
 
-function drawShape(cx,cy,turn1,idx)
-{
+function drawShape(cx,cy,turn1,idx) {
 	if (board_array[idx] == '-') {
 		if (turn1){
 			fill(225,50,0);
@@ -71,6 +70,8 @@ function drawShape(cx,cy,turn1,idx)
 			rect(cx,cy,50,50);
 			board_array[idx] = 'x';
 		}
+	}
+}
 
 function draw() {
 }
