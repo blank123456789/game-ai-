@@ -6,7 +6,7 @@ function setup() {
   boardy = ((windowHeight - height) / 2) + 100;
   board.position(boardx, boardy);
   var reloadButton = createButton("New Game");
-  reloadButton.position(centerx - 10,centery - 75);
+  reloadButton.position(centerx - 12.5,centery - 75);
   reloadButton.mouseClicked(newGame);
   reloadButton.size(120,20);
 }
