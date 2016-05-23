@@ -14,6 +14,7 @@ function setup() {
   reloadButton.size(120,20);
   
   console.log(turns);
+  console.log(player1_turn);
 
 }
 
@@ -36,7 +37,7 @@ function createBoard(x,y){
 }
 
 function takeTurn() {
-	turns++;
+	turns+=1;
 	player1_turn = false;
 }
 
