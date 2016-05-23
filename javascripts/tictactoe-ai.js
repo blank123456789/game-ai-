@@ -18,7 +18,7 @@ var drawTile = function(x,y) {
 }
 
 var draw = function() {
-  
+  ctx.clearRect(0,0,380,380);
 }
 
 setInterval(draw,10)
