@@ -1,13 +1,15 @@
-for (i=0,c = [],d = []; i<grid,i++)
-for (j=0,a = [],b = []; j<grid,j++)
-{
-  a.push(i*grid+j); 
-  b.push(j*grid+i); 
+var Action= function (pos){
+  this.movePosition=pos 
+  this.Minimax value= 0
+  this.Apply to= function(state){
+    var nextMove= new State(state)
 }
-combo.push(a,b)
-c.push(i*grid*i);
-d.push((grid-i-1)*grid+1);
-
+next.turn(this.movePosition)= state.turn
+if (state.turn="o");
+next.oMovecount++;
+then(next.turn=="x");
+}
+}
 function minimaxvalue(state){
    if (state.isTerminal){
      return Game.score(state)
