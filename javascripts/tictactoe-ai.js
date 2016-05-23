@@ -18,14 +18,6 @@ var drawTile = function(x,y) {
 }
 
 var draw = function() {
-  drawTile(20,20);
-  drawTile(20,140);
-  drawTile(20,260);
-  drawTile(140,20);
-  drawTile(140,140);
-  drawTile(140,260);
-  drawTile(260,20);
-  drawTile(260,140);
   
 }
 
