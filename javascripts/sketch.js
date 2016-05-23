@@ -1,3 +1,6 @@
+var player1_turn;
+var turns;
+var board_array = ['-','-','-','-','-','-','-','-','-','-']
 
 function setup() {
 	var centerx = (windowWidth - width) / 2;
@@ -53,6 +56,21 @@ function takeTurn() {
 		}
 	}
 }
+
+function drawShape(cx,cy,turn1,idx)
+{
+	if (board_array[idx] == '-') {
+		if (turn1){
+			fill(225,50,0);
+			ellipse(cx,cy,50,50);
+			board_array[idx] = 'o';
+		}
+		else {
+			rectMode(CENTER);
+			fill(64,219,50);
+			rect(cx,cy,50,50);
+			board_array[idx] = 'x';
+		}
 
 function draw() {
 }
