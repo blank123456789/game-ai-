@@ -17,6 +17,7 @@ function createBoard(x,y){
 	{
 		line(0,(i*y)/3,x,(i*y)/3);
 	}
+	stroke(51);
 	return board;
 }
 
