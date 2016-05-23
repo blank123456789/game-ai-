@@ -54,13 +54,15 @@ function takeTurn() {
 		{
 			drawShape(width/6,5*height/6,player1_turn,3)
 		}
+		turns = turns + 1;
+
 	}
 }
 
 function drawShape(cx,cy,turn1,idx) {
 	if (board_array[idx] == '-') {
 		if (turn1){
-			fill(225);
+			fill(255);
 			ellipse(cx,cy,50,50);
 			board_array[idx] = 'o';
 		}
@@ -70,7 +72,6 @@ function drawShape(cx,cy,turn1,idx) {
 			rect(cx,cy,50,50);
 			board_array[idx] = 'x';
 		}
-		turns = turns + 1;
 	}
 }
 
