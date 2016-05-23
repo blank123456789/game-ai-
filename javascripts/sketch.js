@@ -1,3 +1,4 @@
+
 function setup() {
 	var centerx = (windowWidth - width) / 2;
 	var centery = (windowHeight - height) / 2;
