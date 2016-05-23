@@ -26,7 +26,7 @@ var draw = function() {
   drawTile(140,260);
   drawTile(260,20);
   drawTile(260,140);
-  drawTile(260,260);
+  drawTile(260,200);
 }
 
 setInterval(draw,10)
