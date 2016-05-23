@@ -4,7 +4,7 @@ function setup() {
   boardy = ((windowHeight - height) / 2) + 100;
   board.position(boardx, boardy);
   var reloadButton = createButton("New Game");
-  reloadButton.position((windowWidth - width) / 2,boardy + 20);
+  reloadButton.position(((windowWidth - width) / 2),boardy + 20);
   
   
 }
