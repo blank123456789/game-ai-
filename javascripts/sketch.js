@@ -3,7 +3,7 @@ function setup() {
   boardx = (windowWidth - width) / 2;
   boardy = ((windowHeight - height) / 2) + 100;
   board.position(boardx, boardy);
-  background(51);
+  background(255);
   
 }
 function createBoard(x,y){
@@ -17,7 +17,6 @@ function createBoard(x,y){
 	{
 		line(0,(i*y)/3,x,(i*y)/3);
 	}
-	stroke(51);
 	return board;
 }
 
