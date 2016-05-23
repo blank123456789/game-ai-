@@ -8,7 +8,7 @@ function setup() {
   var reloadButton = createButton("New Game");
   reloadButton.position(centerx,centery - 75);
   reloadButton.mouseClicked(newGame);
-  reloadButton.size(125,15);
+  reloadButton.size(120,20);
 }
 
 var newGame = function() {
