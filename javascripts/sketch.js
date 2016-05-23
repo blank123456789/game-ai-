@@ -54,9 +54,15 @@ function takeTurn() {
 		{
 			drawShape(width/6,5*height/6,player1_turn,3)
 		}
-		turns = turns + 1;
-
 	}
+	if (player1_turn){
+		player1_turn = false
+	}
+	else{
+		player1_turn = true
+	}
+
+	turns = turns + 1;
 }
 
 function drawShape(cx,cy,turn1,idx) {
