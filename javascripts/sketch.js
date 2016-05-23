@@ -109,6 +109,41 @@ function drawShape(cx,cy,turn1,idx) {
 			board_array[idx] = 'x';
 		}
 	}
+	if (checkWinner(turn1)){
+		if (turn1){
+			alert("Player 1 Won!");
+			location.reload();
+		}
+		else{
+			alert("Player 2 Won!");
+			location.reload();
+		}
+	}
+}
+
+function checkWinner(turn1){
+	var game_won = false;
+	if (turn1){
+		var check_symbol = 'o'
+	}
+	else{
+		check_symbol = 'x'
+	}
+	for (i = 0; i < 3; i++){
+		if (board_array[1+i] == check_symbol && board_array[4+i] == check_symbol && board_array[7+i] == check_symbol){
+			game_won = true;
+		}
+		if (board_array[1+3*i] == check_symbol && board_array[2+3*i] == check_symbol && board_array[3+3*i] == check_symbol){
+			game_won = true;
+		}
+	}
+	if (board_array[1] == check_symbol && board_array[5] == check_symbol && board_array[9] == check_symbol){
+		game_won = true;
+	}
+	if (board_array[3] == check_symbol && board_array[5] == check_symbol && board_array[7] == check_symbol){
+		game_won = true;
+	}
+	return game_won;
 }
 
 function draw() {
