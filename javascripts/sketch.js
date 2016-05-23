@@ -12,6 +12,8 @@ function setup() {
   reloadButton.position(centerx - 11.5,centery - 75);
   reloadButton.mouseClicked(newGame);
   reloadButton.size(120,20);
+  
+  console.log(turns);
 
 }
 
