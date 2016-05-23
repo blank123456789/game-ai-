@@ -5,13 +5,17 @@ function setup() {
   boardx = (windowWidth - width) / 2;
   boardy = ((windowHeight - height) / 2) + 100;
   board.position(boardx, boardy);
+  board.mouseClicked(takeTurn);
+  player1_turn = turn;
+  turns = 0;
   var reloadButton = createButton("New Game");
-  reloadButton.position(centerx - 12,centery - 75);
+  reloadButton.position(centerx - 11.5,centery - 75);
   reloadButton.mouseClicked(newGame);
   reloadButton.size(120,20);
+
 }
 
-var newGame = function() {
+function newGame = function() {
 	location.reload();
 }
 
@@ -27,6 +31,11 @@ function createBoard(x,y){
 		line(0,(i*y)/3,x,(i*y)/3);
 	}
 	return board;
+}
+
+function takeTurn() {
+	turns++;
+	player1_turn = false;
 }
 
 function draw() {
