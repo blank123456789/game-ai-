@@ -100,7 +100,7 @@ function drawShape(cx,cy,turn1,idx) {
 		if (turn1){
 			fill(255);
 			//ellipse(cx,cy,50,50);
-			image(img_o, cx - 30, cy - 30, img_o.width/2, img_o.height/2);
+			image(img_o, cx - 35, cy - 35, img_o.width/2, img_o.height/2);
 			board_array[idx] = 'o';
 		}
 		else {
