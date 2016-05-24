@@ -19,6 +19,7 @@ function setup() {
   
   console.log(turns);
   console.log(player1_turn);
+  createCanvas(100, 100, WEBGL);
 
 }
 
@@ -27,7 +28,7 @@ function newGame() {
 }
 
 function createBoard(x,y){
-	var board = createCanvas(x,y, wEBGL);
+	var board = createCanvas(x,y);
 	background(255)
 	for (i = 0; i < 4; i++)
 	{
