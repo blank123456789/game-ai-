@@ -16,4 +16,6 @@ function draw() {
 function changePosition() {
   x = random(1,299);
   y = random(1,299);
+  return x;
+  return y;
 }
