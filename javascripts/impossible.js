@@ -4,5 +4,6 @@ function setup() {
 }
 
 function draw() {
+  var shape = ellipse(10,10,10,10);
   
 }
