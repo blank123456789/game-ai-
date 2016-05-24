@@ -10,7 +10,7 @@ function draw() {
   x = 150;
   y = 150;
   var shape = ellipse(x,y,10,10);
-  shape.mouseOver(changePosition);
+  shape.mouseClicked(changePosition);
 }
 
 function changePosition() {
