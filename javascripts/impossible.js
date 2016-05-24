@@ -1,3 +1,6 @@
+var x;
+var y;
+
 function setup() {
   var c = createCanvas(300,300);
   background(255);
