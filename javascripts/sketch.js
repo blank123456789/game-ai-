@@ -27,7 +27,7 @@ function newGame() {
 }
 
 function createBoard(x,y){
-	var board = createCanvas(x,y);
+	var board = createCanvas(x,y, wEBGL);
 	background(255)
 	for (i = 0; i < 4; i++)
 	{
