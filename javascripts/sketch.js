@@ -106,7 +106,7 @@ function drawShape(cx,cy,turn1,idx) {
 			rectMode(CENTER);
 			fill(255);
 			//rect(cx,cy,50,50);
-			image(img, cx, cy,img.width/5,img.height/5);
+			image(img, cx, cy,img.width/7,img.height/7);
 			board_array[idx] = 'x';
 		}
 	}
