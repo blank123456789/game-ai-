@@ -19,8 +19,6 @@ function setup() {
   
   console.log(turns);
   console.log(player1_turn);
-  createCanvas(100, 100, WEBGL);
-
 }
 
 function newGame() {
@@ -153,7 +151,4 @@ function draw() {
 	img_x = loadImage("images/tictactoe_x.png");
 	img_o = loadImage("images/tictactoe_o.png"); 
 	background(200);
-  rotateX(frameCount * 0.01);
-  rotateY(frameCount * 0.01);
-  box(200, 200, 200);
 }
