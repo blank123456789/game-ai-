@@ -151,5 +151,8 @@ function checkWinner(turn1){
 function draw() {
 	img_x = loadImage("images/tictactoe_x.png");
 	img_o = loadImage("images/tictactoe_o.png"); 
-
+	background(200);
+  rotateX(frameCount * 0.01);
+  rotateY(frameCount * 0.01);
+  box(200, 200, 200);
 }
