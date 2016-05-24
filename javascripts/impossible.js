@@ -4,6 +4,11 @@ function setup() {
 }
 
 function draw() {
-  var shape = ellipse(10,10,10,10);
-  
+  var shape = ellipse(x,y,10,10);
+  shape.mouseOver(changePosition);
+}
+
+function changePosition() {
+  x = random(1,299);
+  y = random(1,299);
 }
