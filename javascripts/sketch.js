@@ -13,7 +13,7 @@ function setup() {
   player1_turn = true;
   turns = 0;
   var reloadButton = createButton("New Game");
-  reloadButton.position(centerx - 11.5,centery - 75);
+  reloadButton.position(centerx - 10,centery - 75);
   reloadButton.mouseClicked(newGame);
   reloadButton.size(120,20);
   
@@ -105,7 +105,8 @@ function drawShape(cx,cy,turn1,idx) {
 		else {
 			rectMode(CENTER);
 			fill(255);
-			rect(cx,cy,50,50);
+			//rect(cx,cy,50,50);
+			image(img, cx, cy);
 			board_array[idx] = 'x';
 		}
 	}
@@ -147,4 +148,5 @@ function checkWinner(turn1){
 }
 
 function draw() {
+	img = loadImage("images/tictactoe_x.png"); 
 }
