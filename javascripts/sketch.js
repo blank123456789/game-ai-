@@ -91,6 +91,8 @@ function takeTurn() {
 	}
 
 	turns = turns + 1;
+	console.log(turns);
+  console.log(player1_turn);
 }
 
 function drawShape(cx,cy,turn1,idx) {
@@ -149,8 +151,5 @@ function checkWinner(turn1){
 function draw() {
 	img_x = loadImage("images/tictactoe_x.png");
 	img_o = loadImage("images/tictactoe_o.png");
-	for(turns<=9) {
-		console.log(turns);
-		console.log(player1_turn);
-	}
+	
 }
