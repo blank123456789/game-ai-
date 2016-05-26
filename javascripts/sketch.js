@@ -17,8 +17,7 @@ function setup() {
   reloadButton.mouseClicked(newGame);
   reloadButton.size(120,20);
   
-  console.log(turns);
-  console.log(player1_turn);
+  
 }
 
 function newGame() {
@@ -149,5 +148,7 @@ function checkWinner(turn1){
 
 function draw() {
 	img_x = loadImage("images/tictactoe_x.png");
-	img_o = loadImage("images/tictactoe_o.png"); 
+	img_o = loadImage("images/tictactoe_o.png");
+	console.log(turns);
+	console.log(player1_turn);
 }
