@@ -85,14 +85,16 @@ function takeTurn() {
 	}
 	if (player1_turn){
 		player1_turn = false
+		console.log("Player 2's turn")
 	}
 	else{
 		player1_turn = true
+		console.log("Player 1's turn")
 	}
 
 	turns = turns + 1;
 	console.log(turns);
-  console.log(player1_turn);
+	console.log(player1_turn);
 }
 
 function drawShape(cx,cy,turn1,idx) {
@@ -151,5 +153,4 @@ function checkWinner(turn1){
 function draw() {
 	img_x = loadImage("images/tictactoe_x.png");
 	img_o = loadImage("images/tictactoe_o.png");
-	
 }
