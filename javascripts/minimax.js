@@ -64,6 +64,7 @@ function minimaxvalue(state){
         availableActions.sort(AIAction.ASCENDING);
          var chosenAction=availableAction[0];
          var next = chosenAction.applyTo(game.currentState);
+         ui.insertat(chosenAction.movepositon,turn);
       }
       
      }
