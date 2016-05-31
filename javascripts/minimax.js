@@ -170,23 +170,29 @@ if (state.turn="o");
 next.oMovecount++;
 then(next.turn=="x");
 }
-}
+};
 function minimaxvalue(state){
    if (state.isTerminal){
      return Game.score(state)
    }
    var stateScore=
    if(state.Turn=="X"){
-     return Game.score == 1000
+     return Game.score == -1000
      else {
-       return State.score == -1000 
+       return State.score == 1000 
      }
+     function takeAmove(turn){...}
+     this.plays = function(game){
+       game=_game;
+     }
+    function takeAmove(turn){
      var availablePositions = state.emptyCells();
      var availableNextStates = availablePositions.map(function(pos)) {
        var action = new AIAction(pos);
        var nextState = action.applyTo(state);
        return nextState;
      }
+    };
      availableNextStates.forEach(function(NextState)){
        var nextScore =minimaxValue(NextState);
        if( state.turn == "X"){
