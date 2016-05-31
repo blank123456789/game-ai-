@@ -60,13 +60,19 @@ return nm;
 }
 function evaluate(){
 var s=0;
-s+ = evaluateLine();
-s+ = evaluateLine();
-s+ = evaluateLine();
-s+ = evaluateLine();
+s+ = evaluateLine(0,1,2);
+s+ = evaluateLine(2,5,8);
+s+ = evaluateLine(2,4,6);
+s+ = evaluateLine(0,3,6);
+s+ = evaluateLine(0,4,8);
+s+ = evaluateLine(1,4,7);
+s+ = evaluateLine(3,4,5);
+s+ = evaluateLine(6,7,8);
 return s;
 }
-function evaluateLine(){
+function evaluateLine(idx1,idx2,idx3){
+  var s =0 
+  if(bestidx)
 }
 var victoryPatterns = (function(){
 })} ();
