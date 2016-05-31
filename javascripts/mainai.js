@@ -61,6 +61,9 @@ return nm;
 function evaluate(){
 var s=0;
 s+ = evaluateLine();
+s+ = evaluateLine();
+s+ = evaluateLine();
+s+ = evaluateLine();
 return s;
 }
 function evaluateLine(){
