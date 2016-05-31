@@ -1,6 +1,6 @@
 var player1_turn;
 var turns;
-var board_array = ['-','-','-','-','-','-','-','-','-','-']
+var board_array = ['x','-','-','-','-','-','-','-','-','-']
 
 function setup() {
 	var centerx = (windowWidth - width) / 2;
