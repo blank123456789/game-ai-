@@ -1,3 +1,151 @@
+var State = function(old){
+  this.turn = "";
+  this.oMovescount="0";
+  this.result="still running "
+  this.board=[];
+  
+  if(typeof old!=="undefined"){
+    var len = old.board.length;
+    this.board =newArray(len);
+    for(var itr=0;itr<len;itr++){
+      this.board[itr]=old.board[itr];
+    }
+   this.turn = old.turn;
+  this.oMovescount=old.oMovescount;
+  this.result=old.result;
+  this.advanceTurn= function(){
+    this.turn==this.turn=="X"?"O";"X";
+  }
+  this.emptyCells=function(){
+  var indxs=[]
+   for(var itr=0;itr<9;itr++){
+      if(this.board[itr]==="E"){
+        indxs.push(itr);
+      }
+    }
+  } 
+  }
+  return indxs
+}this.isTerminal = function() {
+        var B = this.board;
+
+       
+        for(var i = 0; i <= 6; i = i + 3) {
+            if(B[i] !== "E" && B[i] === B[i + 1] && B[i + 1] == B[i + 2]) {
+                this.result = B[i] + "-won"; 
+                return true;
+            }
+        }
+
+           
+        for(var i = 0; i <= 2 ; i++) {
+            if(B[i] !== "E" && B[i] === B[i + 3] && B[i + 3] === B[i + 6]) {
+                this.result = B[i] + "-won"; 
+                return true;
+            }
+        }
+
+   
+        for(var i = 0, j = 4; i <= 2 ; i = i + 2, j = j - 2) {
+            if(B[i] !== "E" && B[i] == B[i + j] && B[i + j] === B[i + 2*j]) {
+                this.result = B[i] + "-won"; 
+                return true;
+            }
+        }
+
+        var available = this.emptyCells();
+        if(available.length == 0) {
+           
+            this.result = "draw"; 
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+
+};
+var AiAction= function (pos){
+  this.movePosition=pos 
+  this.Minimax value= 0
+  this.Apply to= function(state){
+    var nextMove= new State(state)
+}
+}
+AiAction.DESCENDING =function(first action,second action){
+  if(first action>second action)
+    return = -1 ;
+else(first action<second action )
+return = 1
+else 
+return = 0 
+}
+AiAction.ASCENDING = function(first action,second action){
+  if(first action<second action)
+    return = -1 ;
+else(first action>econd action )
+return = 1
+else 
+return = 0 
+}
+var Game = function(autoPlayer) {
+
+  
+    this.ai = autoPlayer;
+
+   
+    this.currentState = new State();
+
+    
+    this.currentState.board = ["E", "E", "E",
+                               "E", "E", "E",
+                               "E", "E", "E"];
+
+    this.currentState.turn = "X"; /st
+
+    
+    this.status = "beginning";
+
+    
+    this.advanceTo = function(_state) {
+        this.currentState = _state;
+        if(_state.isTerminal()) {
+            this.status = "ended";
+
+            if(_state.result === "X-won")
+               
+                ui.switchViewTo("won");
+            else if(_state.result === "O-won")
+                
+                ui.switchViewTo("lost");
+            else
+               
+                ui.switchViewTo("draw");
+        }
+        else {
+            
+            
+            if(this.currentState.turn === "X") {
+                ui.switchViewTo("human");
+            }
+            else {
+ ui.switchViewTo("robot");
+
+         this.ai.notify("O");
+            }
+        }
+    };
+
+ this.start = function() {
+if(this.status = "beginning") {
+  this.advanceTo(this.currentState
+  this.status = "running";
+        }
+    }
+
+};
+
+
 Game.score= function(_state) {
   if (state.result !== "still running"){
     if (state.result !== "O won"){
