@@ -1,8 +1,12 @@
+var Tile.O;
+var Tile.X;
 var player1_turn;
 var turns;
 var board_array = ['-','-','-','-','-','-','-','-','-','-']
 
 function setup() {
+	Tile.O = tile_o;
+	Tile.X = tile_x;
 	var centerx = (windowWidth - width) / 2;
 	var centery = (windowHeight - height) / 2;
   var board = createBoard(380,380);
@@ -149,10 +153,9 @@ function checkWinner(turn1){
 	}
 	return game_won;
 }
-var Tile.O = "images/tictactoe_x.png"
-var Tile.X = "images/tictactoe_o.png"
+
 function draw() {
-  Tile.O;
-  Tile.X
+ img_x = loadImage("images/tictactoe_x.png");
+ img_o = loadImage("images/tictactoe_o.png");
 	
 }
