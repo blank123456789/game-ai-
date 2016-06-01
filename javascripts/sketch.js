@@ -1,12 +1,10 @@
-var Tile.O;
-var Tile.X;
+var tile_o;
+var tile_x;
 var player1_turn;
 var turns;
 var board_array = ['-','-','-','-','-','-','-','-','-','-']
 
 function setup() {
-	Tile.O = tile_o;
-	Tile.X = tile_x;
 	var centerx = (windowWidth - width) / 2;
 	var centery = (windowHeight - height) / 2;
   var board = createBoard(380,380);
