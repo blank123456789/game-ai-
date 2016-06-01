@@ -1,14 +1,14 @@
 var tile_o;
- -var tile_x;
- -var player1_turn;
- -var turns;
- -var board_array = ['-','-','-','-','-','-','-','-','-','-']
+ var tile_x;
+ var player1_turn;
+ var turns;
+ var board_array = ['-','-','-','-','-','-','-','-','-','-']
   
- -function setup() {
- -	var centerx = (windowWidth - width) / 2;
- -	var centery = (windowHeight - height) / 2;
- -  var board = createBoard(380,380);
- -  boardx = (windowWidth - width) / 2;
+ function setup() {
+ 	var centerx = (windowWidth - width) / 2;
+ 	var centery = (windowHeight - height) / 2;
+   var board = createBoard(380,380);
+   boardx = (windowWidth - width) / 2;
  -  boardy = ((windowHeight - height) / 2) + 100;
  -  board.position(boardx, boardy);
  -  board.mouseClicked(takeTurn);
