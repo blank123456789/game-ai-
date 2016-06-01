@@ -72,10 +72,74 @@ return s;
 }
 function evaluateLine(idx1,idx2,idx3){
   var s =0 
-  if(bestidx)
+  if(data[idx1].equals(seed)){
+    s=1
+  }else if(data[idx1].equals(oppSeed)){
+    s=-1
+  } if(data[idx2].equals(seed)){
+    if(s=== 1){
+      s=10
+    }else if(s===-1){
+      return 0;
+    }else{
+      s=1;
+    }
+  }else if(data[idx2].equals(oppSeed)){
+     if(s=== -1){
+      s=-10
+    }else if(s===1){
+      return 0;
+    }else{
+      s=-1;
+  } if(data[idx3]equals(seed)){
+    if( s>0){
+      s *=10
+    }else(s===1){
+      return 0;
+    }else{
+      s=-1
+    }
+  }else if(data[idx3].equals(oppSeed)){
+    if( s<0){
+      s *=10
+    }else(s>1){
+      return 0;
+    }else{
+      s=-1
+    }
+  }
+  
+  }
+  }
 }
 var victoryPatterns = (function(){
+  var vp = ["111000000","000111000","000000111"
+             "100100100","010010010","001001001"
+              "100010001","001010100"]
+              r=newArray(vp.length);
+              for(var i = vp.length;i--){
+                r[i]=parseInt(vp[i],2)
+              }
+              return r 
 })} ();
 this.hasWon=function(player){
+  var p=0 ;
+  for(var i= data.length;i--){
+    if(data[i].equals(player)){
+      p=|p=(1<<i)
+    }
+  }for(var i=victoryPatterns.length;i--){
+    var v= victoryPatterns[i]
+    if((p&vp)===vp)return true;
+  }
+  return false;
+}
+this.hasWinners= function(player){
+  if(hasWon(seed)){
+    return seed;
+  } if(hasWon(oppSeed)){
+    return oppSeed;
+  }
+  return false;
 }
 }
