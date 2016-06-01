@@ -1,9 +1,4 @@
-var player,ai;
-init();
-function init(){
-player=Tile.O
-ai= new Ai();
-ai.setSeed(player ===Tile.O ?:Tile.X:Tile.O );
+
 function Ai(data){
 var data=data,seed,opp seed;
 this.setSeed=function(_seed){
