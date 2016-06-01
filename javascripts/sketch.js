@@ -1,192 +1,159 @@
-
-function StateManager() {
-
-	var state = {},
-		next = null,
-		active = null,
-		anim = 0,
-		right = false;
-
-	this.active_name = null;
-
-	this.add = function() {
-		for (var i = arguments.length; i--;) {
-			var arg = arguments[i];
-			state[arg.name] = arg;
-		}
-	}
-	this.set = function(name) {
-		active = state[name];
-		this.active_name = name;
-	}
-	this.get = function(name) {
-		return state[name];
-	}
-	this.change = function(name, _right) {
-		anim = 0;
-		right = _right || false;
-		next = name;
-		this.active_name = name;
-	}
-	this.tick = function(ctx) {
-		if (next) {
-			if (anim <= 1) {
-				anim += 0.02;
-				
-				active.update();
-				state[next].update();
-
-				var c1 = active.render(),
-					c2 = state[next].render(),
-
-					c1w = c1.width,
-					c1h = c1.height,
-					c2w = c2.width,
-					c2h = c2.height,
-
-					res = 2,
-
-					p,
-					t = anim;
-				p = t < 0.5 ? 2*t*t : -2*(t*(t - 2)) - 1;
-
-				if (right) {
-					p = 1 - p;
-					var t = c2;
-					c2 = c1;
-					c1 = t;
-				}
-
-				for (var i = 0; i < c1w; i += res) {
-					ctx.drawImage(c1, i, 0, res, c1h,
-						i - p*i,
-						(c1w - i)*p*0.2,
-						res,
-						c1h - (c1w - i)*p*0.4
-					);
-				}
-				p = 1 - p;
-				for (var i = 0; i < c2w; i += res) {
-					ctx.drawImage(c2, i, 0, res, c2h,
-						i - (i - c2w)*p,
-						i*p*0.2,
-						res,
-						c1h - i*p*0.4
-					);
-				}
-
-			} else {
-				active = state[next];
-				next = false;
-				active.update();
-				active.render(ctx);
-			}
-		} else {
-			active.update();
-			active.render(ctx);
-		}
-	}
-}
-
-function Tile(x, y) {
-
-	var x = x, y = y;
-
-	var tile = Tile.BLANK;
-	var anim = 0;
-
-	if (tile == null) {
-		(function() {
-			var _c = document.createElement("canvas");
-			_c.width = _c.height = 100;
-			var _ctx = _c.getContext("2d");
-
-			_ctx.fillStyle = "green";
-			_ctx.lineWidth = 4;
-			_ctx.strokeStyle = "red";
-			_ctx.lineCap = "round";
-
-			// Blank
-			_ctx.fillRect(0, 0, 100, 100);
-			Tile.BLANK = new Image();
-			Tile.BLANK.src = _c.toDataURL();
-
-			// Nought
-			_ctx.fillRect(0, 0, 100, 100);
-
-			_ctx.beginPath();
-			_ctx.arc(50, 50, 30, 0, 2*Math.PI);
-			_ctx.stroke();
-
-			Tile.NOUGHT = new Image();
-			Tile.NOUGHT.src = _c.toDataURL();
-
-			// Cross
-			_ctx.fillRect(0, 0, 100, 100);
-
-			_ctx.beginPath();
-			_ctx.moveTo(20, 20);
-			_ctx.lineTo(80, 80);
-			_ctx.moveTo(80, 20);
-			_ctx.lineTo(20, 80);
-			_ctx.stroke();
-
-			Tile.CROSS = new Image();
-			Tile.CROSS.src = _c.toDataURL();
-		})();
-		tile = Tile.BLANK;
-	}
-
-	this.active = function() {
-		return anim > 0;
-	}
-
-	this.equals = function(_tile) {
-		return tile === _tile;
-	}
-
-	this.hasData = function() {
-		return tile !== Tile.BLANK;
-	}
-
-	this.set = function(next) {
-		tile = next;
-	}
-
-	this.flip = function(next) {
-		tile = next;
-		anim = 1;
-	}
-
-	this.update = function() {
-		if (anim > 0) {
-			anim -= 0.02;
-		}
-	}
-
-	this.draw = function(ctx) {
-		if (anim <= 0) {
-			ctx.drawImage(tile, x, y);
-			return;
-		}
-
-		var res = 2;
-		var t = anim > 0.5 ? Tile.BLANK : tile;
-		var p = -Math.abs(2*anim - 1) + 1;
-
-		p *= p;
-
-		for (var i = 0; i < 100; i += res) {
-
-			var j = 50 - (anim > 0.5 ? 100 - i : i);
-
-			ctx.drawImage(t, i, 0, res, 100,
-				x + i - p*i + 50*p,
-				y - j*p*0.2,
-				res,
-				100 + j*p*0.4
-			);
-		}
-	}
-
-}
+var tile_o;
+ -var tile_x;
+ -var player1_turn;
+ -var turns;
+ -var board_array = ['-','-','-','-','-','-','-','-','-','-']
+  
+ -function setup() {
+ -	var centerx = (windowWidth - width) / 2;
+ -	var centery = (windowHeight - height) / 2;
+ -  var board = createBoard(380,380);
+ -  boardx = (windowWidth - width) / 2;
+ -  boardy = ((windowHeight - height) / 2) + 100;
+ -  board.position(boardx, boardy);
+ -  board.mouseClicked(takeTurn);
+ -  player1_turn = true;
+ -  turns = 0;
+ -  var reloadButton = createButton("New Game");
+ -  reloadButton.position(centerx - 10,centery - 75);
+ -  reloadButton.mouseClicked(newGame);
+ -  reloadButton.size(120,20);
+ -  
+ -  
+ -}
+ -
+ -function newGame() {
+ -	location.reload();
+ -}
+ -
+ -function createBoard(x,y){
+ -	var board = createCanvas(x,y);
+ -	background(255)
+ -	for (i = 0; i < 4; i++)
+ -	{
+ -		line((i*x)/3,0,(i*x)/3,y);
+ -	}
+ -	for (i = 0; i < 4; i++)
+ -	{
+ -		line(0,(i*y)/3,x,(i*y)/3);
+ -	}
+ -	return board;
+ -}
+ -
+ -function takeTurn() {
+ -	if (mouseX > 0 && mouseX < width/3) {
+ -		if (mouseY > 0 && mouseY < height/3) 
+ -		{
+ -			drawShape(width/6,height/6,player1_turn,1)
+ -		}
+ -		else if (mouseY > height/3 && mouseY < 2*height/3) 
+ -		{
+ -			drawShape(width/6,3*height/6,player1_turn,2)
+ -		}
+ -		else if(mouseY > 2*height/3 && mouseY < height) 
+ -		{
+ -			drawShape(width/6,5*height/6,player1_turn,3)
+ -		}
+ -	}
+ -	else if (mouseX > width/3 && mouseX < 2*width/3) 
+ -	{
+ -		if (mouseY > 0 && mouseY < height/3) 
+ -		{
+ -			drawShape(3*width/6,height/6,player1_turn,4)
+ -		}
+ -		else if (mouseY> height/3 && mouseY < 2*height/3) 
+ -		{
+ -			drawShape(3*width/6,3*height/6,player1_turn,5)
+ -		}
+ -		else if(mouseY > 2*height/3 && mouseY < height) 
+ -		{
+ -			drawShape(3*width/6,5*height/6,player1_turn,6)
+ -		}
+ -	}
+ -	else if (mouseX > 2*width/3 && mouseX < width) 
+ -	{
+ -		if (mouseY > 0 && mouseY < height/3) 
+ -		{
+ -			drawShape(5*width/6,1*height/6,player1_turn,7)
+ -		}
+ -		else if (mouseY> height/3 && mouseY < 2*height/3) 
+ -		{
+ -			drawShape(5*width/6,3*height/6,player1_turn,8)
+ -		}
+ -		else if(mouseY > 2*height/3 && mouseY < height) 
+ -		{
+ -			drawShape(5*width/6,5*height/6,player1_turn,9)
+ -		}
+ -	}
+ -	if (player1_turn){
+ -		player1_turn = false
+ -		console.log("Player 2's turn")
+ -	}
+ -	else{
+ -		player1_turn = true
+ -		console.log("Player 1's turn")
+ -	}
+ -
+ -	turns = turns + 1;
+ -	console.log(turns);
+ -	console.log(player1_turn);
+ -}
+ -
+ -function drawShape(cx,cy,turn1,idx) {
+ -	if (board_array[idx] == '-') {
+ -		if (turn1){
+ -			fill(255);
+ -			//ellipse(cx,cy,50,50);
+ -			image(img_o, cx - 35, cy - 35, img_o.width/2, img_o.height/2);
+ -			board_array[idx] = 'o';
+ -		}
+ -		else {
+ -			rectMode(CENTER);
+ -			fill(255);
+ -			//rect(cx,cy,50,50);
+ -			image(img_x, cx - 30, cy - 30,img_x.width/9,img_x.height/9);
+ -			board_array[idx] = 'x';
+ -		}
+ -	}
+ -	if (checkWinner(turn1)){
+ -		if (turn1){
+ -			alert("Player 1 Won!");
+ -			location.reload();
+ -		}
+ -		else{
+ -			alert("Player 2 Won!");
+ -			location.reload();
+ -		}
+ -	}
+ -}
+ -
+ -function checkWinner(turn1){
+ -	var game_won = false;
+ -	if (turn1){
+ -		var check_symbol = 'o'
+ -	}
+ -	else{
+ -		check_symbol = 'x'
+ -	}
+ -	for (i = 0; i < 3; i++){
+ -		if (board_array[1+i] == check_symbol && board_array[4+i] == check_symbol && board_array[7+i] == check_symbol){
+ -			game_won = true;
+ -		}
+ -		if (board_array[1+3*i] == check_symbol && board_array[2+3*i] == check_symbol && board_array[3+3*i] == check_symbol){
+ -			game_won = true;
+ -		}
+ -	}
+ -	if (board_array[1] == check_symbol && board_array[5] == check_symbol && board_array[9] == check_symbol){
+ -		game_won = true;
+ -	}
+ -	if (board_array[3] == check_symbol && board_array[5] == check_symbol && board_array[7] == check_symbol){
+ -		game_won = true;
+ -	}
+ -	return game_won;
+ -}
+ -
+ -function draw() {
+ - img_x = loadImage("images/tictactoe_x.png");
+ - img_o = loadImage("images/tictactoe_o.png");
+ -	
+ -}
