@@ -149,8 +149,10 @@ function checkWinner(turn1){
 	}
 	return game_won;
 }
-
+var Tile.O = img_o 
+var Tile.X = img_x
 function draw() {
 	img_x = loadImage("images/tictactoe_x.png");
 	img_o = loadImage("images/tictactoe_o.png");
+	
 }
