@@ -136,7 +136,7 @@ this.hasWinners= function(player){
   } if(hasWon(oppSeed)){
     return oppSeed;
   }
-  return false;
+   return false;
 }
 
 }
