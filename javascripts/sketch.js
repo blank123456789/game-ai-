@@ -1,6 +1,7 @@
  var tile_o;
  var tile_x;
  var player1_turn;
+ var ai_turn;
  var turns;
  var board_array = ['-','-','-','-','-','-','-','-','-','-']
   
@@ -48,41 +49,41 @@
  		}
  		else if (mouseY > height/3 && mouseY < 2*height/3) 
  		{
- 			drawShape(width/6,3*height/6,player1_turn,2)
+ 			drawShape(width/6,3*height/6,Ai_turn,1)
  		}
  		else if(mouseY > 2*height/3 && mouseY < height) 
  		{
- 		drawShape(width/6,5*height/6,player1_turn,3)
+ 		drawShape(width/6,5*height/6,player1_turn,2)
  		}
  	}
  	else if (mouseX > width/3 && mouseX < 2*width/3) 
  	{
  		if (mouseY > 0 && mouseY < height/3) 
  		{
- 			drawShape(3*width/6,height/6,player1_turn,4)
+ 			drawShape(3*width/6,height/6,Ai_turn,2)
  		}
  		else if (mouseY> height/3 && mouseY < 2*height/3) 
  		{
- 			drawShape(3*width/6,3*height/6,player1_turn,5)
+ 			drawShape(3*width/6,3*height/6,player1_turn,3)
  		}
  		else if(mouseY > 2*height/3 && mouseY < height) 
  		{
- 			drawShape(3*width/6,5*height/6,player1_turn,6)
+ 			drawShape(3*width/6,5*height/6,Ai_turn,3)
  		}
  	}
  	else if (mouseX > 2*width/3 && mouseX < width) 
  	{
  		if (mouseY > 0 && mouseY < height/3) 
  		{
- 			drawShape(5*width/6,1*height/6,player1_turn,7)
+ 			drawShape(5*width/6,1*height/6,player1_turn,4)
  		}
  		else if (mouseY> height/3 && mouseY < 2*height/3) 
  		{
- 			drawShape(5*width/6,3*height/6,player1_turn,8)
+ 			drawShape(5*width/6,3*height/6,Ai_turn,4)
  		}
  		else if(mouseY > 2*height/3 && mouseY < height) 
  		{
- 			drawShape(5*width/6,5*height/6,player1_turn,9)
+ 			drawShape(5*width/6,5*height/6,player1_turn,5)
  		}
  	}
  	if (player1_turn){
