@@ -1,7 +1,7 @@
  var tile_o;
  var tile_x;
  var player1_turn;
- var ai_turn;
+ var Ai_turn;
  var turns;
  var board_array = ['-','-','-','-','-','-','-','-','-','-']
   
