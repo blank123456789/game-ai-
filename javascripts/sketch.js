@@ -49,41 +49,41 @@
  		}
  		else if (mouseY > height/3 && mouseY < 2*height/3) 
  		{
- 			drawShape(width/6,3*height/6,Ai_turn,1)
+ 			drawShape(width/6,3*height/6,Ai_turn,2)
  		}
  		else if(mouseY > 2*height/3 && mouseY < height) 
  		{
- 		drawShape(width/6,5*height/6,player1_turn,2)
+ 		drawShape(width/6,5*height/6,player1_turn,3)
  		}
  	}
  	else if (mouseX > width/3 && mouseX < 2*width/3) 
  	{
  		if (mouseY > 0 && mouseY < height/3) 
  		{
- 			drawShape(3*width/6,height/6,Ai_turn,2)
+ 			drawShape(3*width/6,height/6,Ai_turn,4)
  		}
  		else if (mouseY> height/3 && mouseY < 2*height/3) 
  		{
- 			drawShape(3*width/6,3*height/6,player1_turn,3)
+ 			drawShape(3*width/6,3*height/6,player1_turn,5)
  		}
  		else if(mouseY > 2*height/3 && mouseY < height) 
  		{
- 			drawShape(3*width/6,5*height/6,Ai_turn,3)
+ 			drawShape(3*width/6,5*height/6,Ai_turn,6)
  		}
  	}
  	else if (mouseX > 2*width/3 && mouseX < width) 
  	{
  		if (mouseY > 0 && mouseY < height/3) 
  		{
- 			drawShape(5*width/6,1*height/6,player1_turn,4)
+ 			drawShape(5*width/6,1*height/6,player1_turn,7)
  		}
  		else if (mouseY> height/3 && mouseY < 2*height/3) 
  		{
- 			drawShape(5*width/6,3*height/6,Ai_turn,4)
+ 			drawShape(5*width/6,3*height/6,Ai_turn,8)
  		}
  		else if(mouseY > 2*height/3 && mouseY < height) 
  		{
- 			drawShape(5*width/6,5*height/6,player1_turn,5)
+ 			drawShape(5*width/6,5*height/6,player1_turn,9)
  		}
  	}
  	if (player1_turn){
