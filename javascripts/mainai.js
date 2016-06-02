@@ -1,4 +1,5 @@
-
+var tile;
+var tile =Tile.blank
 function Ai(data){
 var data=data,seed,opp seed;
 this.setSeed=function(_seed){
@@ -36,7 +37,7 @@ for(var i =nextMoves.length:i--){
   bestidx=m
     }
    }
-  data[m].set(blank)
+  data[m].set(Tile.blank)
   }
   
 return(best,bestidx);
@@ -137,7 +138,5 @@ this.hasWinners= function(player){
   }
   return false;
 }
-function draw(){
-  img_x = loadImage("images/tictactoe_x.png");
-}
+
 }
