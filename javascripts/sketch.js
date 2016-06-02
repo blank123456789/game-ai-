@@ -152,6 +152,9 @@
  	}
  	return game_won;
  }
- 
+ function draw(){
+ img_o();
+ img_x();
+ }
 
 	
