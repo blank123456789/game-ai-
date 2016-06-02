@@ -112,7 +112,7 @@
  		rectMode(CENTER);
  			fill(255);
  			//rect(cx,cy,50,50);
- 			image(img_x, cx - 30, cy - 30,img_x.width/4,img_x.height/4);
+ 			image(img_x, cx - 30, cy - 30,img_x.width/9,img_x.height/9);
  			board_array[idx] = 'x';
  		}
  	}
