@@ -154,7 +154,7 @@
  }
  function draw(){
  img_o=loadImage("images/tictactoe_o.png");
- img_x=loadImage("images/tictactoe_o.png");
+ img_x=loadImage("images/tictactoe_x.png");
  }
 
 	
