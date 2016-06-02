@@ -6,8 +6,8 @@
  var board_array = ['-','-','-','-','-','-','-','-','-','-']
   
  function setup() {
- 	var centerx = (windowWidth - width) / 2;
- 	var centery = (windowHeight - height) / 2;
+ 	 var centerx = (windowWidth - width) / 2;
+ 	 var centery = (windowHeight - height) / 2;
    var board = createBoard(380,380);
    boardx = (windowWidth - width) / 2;
    boardy = ((windowHeight - height) / 2) + 100;
@@ -107,6 +107,7 @@
  			//ellipse(cx,cy,50,50);
  			image(img_o, cx - 35, cy - 35, img_o.width/2, img_o.height/2);
  			board_array[idx] = 'o';
+ 			console.log("O drawn")
  		}
  		else {
  		rectMode(CENTER);
@@ -114,6 +115,7 @@
  			//rect(cx,cy,50,50);
  			image(img_x, cx - 30, cy - 30,img_x.width/9,img_x.height/9);
  			board_array[idx] = 'x';
+ 			console.log("X drawn")
  		}
  	}
  	if (checkWinner(turn1)){
