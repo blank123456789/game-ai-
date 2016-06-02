@@ -137,4 +137,7 @@ this.hasWinners= function(player){
   }
   return false;
 }
+function draw(){
+  img_x = loadImage("images/tictactoe_x.png");
+}
 }
