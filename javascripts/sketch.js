@@ -153,8 +153,8 @@
  	return game_won;
  }
  function draw(){
- img_o();
- img_x();
+ img_o=loadImage("images/tictactoe_o.png");
+ img_x=loadImage("images/tictactoe_o.png");
  }
 
 	
