@@ -1,8 +1,8 @@
  var tile;
 var tile =Tile.blank
-var Ai_turn=true 
+var Ai_player;
 
-function Ai(data){
+var Ai_player = function Ai(data){
 var data=data,seed,opp seed;
 this.setSeed=function(_seed){
 var seed=_seed 
@@ -139,7 +139,7 @@ this.hasWinners= function(player){
     return oppSeed;
   }
    return false;
-   console.log(function Ai);
+   console.log(Ai_player);
 }
 
 }
