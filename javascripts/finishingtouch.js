@@ -1,5 +1,5 @@
-var X = ""
-var O = ""
+var X = "images/tictactoe_x.png"
+var O = "image/tictactoe_o.png"
 var State = function(old){
  this.turn = "";
    this.oMovescount="0";
