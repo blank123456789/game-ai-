@@ -1,9 +1,12 @@
 var ui = {};
 var X;
 ui.insertAt = function(indx, symbol) {
-           var X=loadImage("images/tictactoe_x.png")
+           var X="images/tictactoe_x.png"
            
         });
+ui.insertat(chosenAction.movePositon,turn){
+           loadImage("images/tictactoe_x.png" ,x ,y);
+}       
        
     }
 }
