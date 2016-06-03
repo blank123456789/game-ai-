@@ -1,15 +1,11 @@
 console.log('This would be the main JS file.');
 var ui = {};
+var X;
 ui.insertAt = function(indx, symbol) {
-    var board = $('.cell');
-    var targetCell = $(board[indx]);
-
-    if(!targetCell.hasClass('occupied')) {
-        targetCell.html(symbol);
-        targetCell.css({
+           var X=loadImage("images/tictactoe_x.png")
             color : symbol == "X" ? "green" : "red"
         });
-        targetCell.addClass('occupied');
+       
     }
 }
 var AiAction= function (pos){
