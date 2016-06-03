@@ -1,3 +1,5 @@
+var X = img_x
+var O = img_o
 var State = function(old){
  this.turn = "";
    this.oMovescount="0";
@@ -65,7 +67,7 @@ var State = function(old){
  
  };
  var ui = {};
-var X;
+
 ui.insertAt = function(indx, symbol) {
            vif(!targetCell.hasClass('occupied')) {
         targetCell.html(symbol);
