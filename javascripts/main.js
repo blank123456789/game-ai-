@@ -1,4 +1,17 @@
 console.log('This would be the main JS file.');
+var ui = {};
+ui.insertAt = function(indx, symbol) {
+    var board = $('.cell');
+    var targetCell = $(board[indx]);
+
+    if(!targetCell.hasClass('occupied')) {
+        targetCell.html(symbol);
+        targetCell.css({
+            color : symbol == "X" ? "green" : "red"
+        });
+        targetCell.addClass('occupied');
+    }
+}
 var AiAction= function (pos){
    this.movePosition=pos 
    this.Minimax value= 0
