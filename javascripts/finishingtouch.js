@@ -1,5 +1,5 @@
-var X = img_x
-var O = img_o
+var X = ""
+var O = ""
 var State = function(old){
  this.turn = "";
    this.oMovescount="0";
