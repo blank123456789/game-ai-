@@ -1,12 +1,18 @@
 var ui = {};
 var X;
 ui.insertAt = function(indx, symbol) {
-           var X="images/tictactoe_x.png"
-           
+           vif(!targetCell.hasClass('occupied')) {
+        targetCell.html(symbol);
+        targetCell.css({
+            color : symbol == "X" ? "green" : "red"
         });
-ui.insertat(chosenAction.movePositon,turn){
-           loadImage("images/tictactoe_x.png" ,x ,y);
-}       
+        targetCell.addClass('occupied');
+    }
+}
+
+        });
+
+       
        
     }
 }
