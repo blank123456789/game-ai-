@@ -35,9 +35,7 @@ ui.switchViewTo = function(turn) {
 ui.insertAt = function(indx, symbol) {
            vif(!targetCell.hasClass('occupied')) {
         targetCell.html(symbol);
-        targetCell.css({
-            color : symbol == "X" ? "green" : "red"
-        });
+        
         targetCell.addClass('occupied');
     }
 }
