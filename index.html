@@ -19,7 +19,12 @@
   </head>
   <body>
     <script>
-   
+    var imageObj=new Image();
+    var symbol = imageObj;
+    imageObj.onload= function(){
+      context.drawImage(imageObj,x,y);
+    };
+    imageObj.src= "images/tictactoe_x.png"
     
   </script>
       <div id="header">
@@ -51,22 +56,19 @@
           <span class="credits left">and<a href="https://github.com/leviu02"> Leviu02</a></span>
           <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
         </div>
-       
         
         <!--<canvas id="tictaccanvas" style="color:white;border:3px solid #32EDF2;width:650px;height:650px"></canvas>-->
        
         
         <!--<script src="javascripts/minimax.js"></script>
         <script src="javascripts/tictactoe-ai.js"></script>-->
-       
-       
-       
+        <script src="javascripts/p5.js"></script>
+        <script src="javascripts/p5.dom.js"></script>
+        <script src="javascripts/p5.sound.js"></script>
         <script src="javascripts/sketch.js"></script
         <script src="javascripts/arvind.js"></script>
         <script src="javascripts/finishingtouch.js"></script>
-        
         <script>
-
         <!--<script src="javascripts/impossible.js"></script>-->
         <h3>
           
