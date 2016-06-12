@@ -17,76 +17,7 @@ AiAction.ASCENDING = function(first action,second action){
  else 
  return = 0 
  }
- var Game = function(autoPlayer) {
  
-  
-     this.ai = autoPlayer;
- 
-    
-     this.currentState = new State();
- 
-     
-     this.currentState.board = ["E", "E", "E",
-                                "E", "E", "E",
-                                "E", "E", "E"];
- 
-     this.currentState.turn = "X"; /st
- 
-     
-     this.status = "beginning";
- 
-     
-     this.advanceTo = function(_state) {
-         this.currentState = _state;
-         if(_state.isTerminal()) {
-             this.status = "ended";
- 
-             if(_state.result === "X-won")
-                
-                 ui.switchViewTo("won");
-             else if(_state.result === "O-won")
-                 
-                 ui.switchViewTo("lost");
-             else
-                
-                 ui.switchViewTo("draw");
-         }
-         else {
-             
-             
-             if(this.currentState.turn === "X") {
-                 ui.switchViewTo("human");
-             }
-             else {
-  ui.switchViewTo("robot");
- 
-          this.ai.notify("O");
-             }
-         }
-     };
- 
-  this.start = function() {
- if(this.status = "beginning") {
-   this.advanceTo(this.currentState
-   this.status = "running";
-         }
-     }
- 
- };
- 
-   Game.score= function(_state) {
-   if (state.result !== "still running"){
-     if (state.result !== "O won"){
-       return = 10 - _state.oMovescount;
-     }
-     else(state.result !== "x won"){
-       return = -10 + _state.oMovescount;
-     }
-       else(state.result!="draw"){
-       return = 0 
-       }
-       }
- }
  var Action= function (pos){
    this.movePosition=pos 
    this.Minimax value= 0
