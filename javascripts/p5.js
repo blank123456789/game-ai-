@@ -17840,5 +17840,6173 @@ p5.prototype.key = '';
  * </code></div>
  */
 p5.prototype.keyCode = 0;
+/*! p5.dom.js v0.2.9 March 3, 2016 */
+/**
+ * <p>The web is much more than just canvas and p5.dom makes it easy to interact
+ * with other HTML5 objects, including text, hyperlink, image, input, video,
+ * audio, and webcam.</p>
+ * <p>There is a set of creation methods, DOM manipulation methods, and
+ * an extended p5.Element that supports a range of HTML elements. See the
+ * <a href="https://github.com/processing/p5.js/wiki/Beyond-the-canvas">
+ * beyond the canvas tutorial</a> for a full overview of how this addon works.
+ *
+ * <p>Methods and properties shown in black are part of the p5.js core, items in
+ * blue are part of the p5.dom library. You will need to include an extra file
+ * in order to access the blue functions. See the
+ * <a href="http://p5js.org/libraries/#using-a-library">using a library</a>
+ * section for information on how to include this library. p5.dom comes with
+ * <a href="http://p5js.org/download">p5 complete</a> or you can download the single file
+ * <a href="https://raw.githubusercontent.com/lmccart/p5.js/master/lib/addons/p5.dom.js">
+ * here</a>.</p>
+ * <p>See <a href="https://github.com/processing/p5.js/wiki/Beyond-the-canvas">tutorial: beyond the canvas</a>
+ * for more info on how to use this libary.</a>
+ *
+ * @module p5.dom
+ * @submodule p5.dom
+ * @for p5.dom
+ * @main
+ */
+
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd)
+    define('p5.dom', ['p5'], function (p5) { (factory(p5));});
+  else if (typeof exports === 'object')
+    factory(require('../p5'));
+  else
+    factory(root['p5']);
+}(this, function (p5) {
+// =============================================================================
+//                         p5 additions
+// =============================================================================
+
+  /**
+   * Searches the page for an element with the given ID, class, or tag name (using the '#' or '.'
+   * prefixes to specify an ID or class respectively, and none for a tag) and returns it as
+   * a p5.Element. If a class or tag name is given with more than 1 element,
+   * only the first element will be returned.
+   * The DOM node itself can be accessed with .elt.
+   * Returns null if none found. You can also specify a container to search within.
+   *
+   * @method select
+   * @param  {String} name id, class, or tag name of element to search for
+   * @param  {String} [container] id, p5.Element, or HTML element to search within
+   * @return {Object/p5.Element|Null} p5.Element containing node found
+   * @example
+   * <div ><code class='norender'>
+   * function setup() {
+   *   createCanvas(100,100);
+   *   //translates canvas 50px down
+   *   select('canvas').position(100, 100);
+   * }
+   * </code></div>
+   * <div ><code class='norender'>
+   * // these are all valid calls to select()
+   * var a = select('#moo');
+   * var b = select('#blah', '#myContainer');
+   * var c = select('#foo', b);
+   * var d = document.getElementById('beep');
+   * var e = select('p', d);
+   * </code></div>
+   *
+   */
+  p5.prototype.select = function (e, p) {
+    var res = null;
+    var container = getContainer(p);
+    if (e[0] === '.'){
+      e = e.slice(1);
+      res = container.getElementsByClassName(e);
+      if (res.length) {
+        res = res[0];
+      } else {
+        res = null;
+      }
+    }else if (e[0] === '#'){
+      e = e.slice(1);
+      res = container.getElementById(e);
+    }else {
+      res = container.getElementsByTagName(e);
+      if (res.length) {
+        res = res[0];
+      } else {
+        res = null;
+      }
+    }
+    if (res) {
+      return wrapElement(res);
+    } else {
+      return null;
+    }
+  };
+
+  /**
+   * Searches the page for elements with the given class or tag name (using the '.' prefix
+   * to specify a class and no prefix for a tag) and returns them as p5.Elements
+   * in an array.
+   * The DOM node itself can be accessed with .elt.
+   * Returns an empty array if none found.
+   * You can also specify a container to search within.
+   *
+   * @method selectAll
+   * @param  {String} name class or tag name of elements to search for
+   * @param  {String} [container] id, p5.Element, or HTML element to search within
+   * @return {Array} Array of p5.Elements containing nodes found
+   * @example
+   * <div ><code class='norender'>
+   * function setup() {
+   *   createButton('btn');
+   *   createButton('2nd btn');
+   *   createButton('3rd btn');
+   *   var buttons = selectAll('button');
+   *
+   *   for (var i = 0; i < buttons.length; i++){
+   *     buttons[i].size(100,100);
+   *   }
+   * }
+   * </code></div>
+   * <div ><code class='norender'>
+   * // these are all valid calls to selectAll()
+   * var a = selectAll('.moo');
+   * var b = selectAll('div');
+   * var c = selectAll('button', '#myContainer');
+   * var d = select('#container');
+   * var e = selectAll('p', d);
+   * var f = document.getElementById('beep');
+   * var g = select('.blah', f);
+   * </code></div>
+   *
+   */
+  p5.prototype.selectAll = function (e, p) {
+    var arr = [];
+    var res;
+    var container = getContainer(p);
+    if (e[0] === '.'){
+      e = e.slice(1);
+      res = container.getElementsByClassName(e);
+    } else {
+      res = container.getElementsByTagName(e);
+    }
+    if (res) {
+      for (var j = 0; j < res.length; j++) {
+        var obj = wrapElement(res[j]);
+        arr.push(obj);
+      }
+    }
+    return arr;
+  };
+
+  /**
+   * Helper function for select and selectAll
+   */
+  function getContainer(p) {
+    var container = document;
+    if (typeof p === 'string' && p[0] === '#'){
+      p = p.slice(1);
+      container = document.getElementById(p) || document;
+    } else if (p instanceof p5.Element){
+      container = p.elt;
+    } else if (p instanceof HTMLElement){
+      container = p;
+    }
+    return container;
+  }
+
+  /**
+   * Helper function for getElement and getElements.
+   */
+  function wrapElement(elt) {
+    if(elt.tagName === "INPUT" && elt.type === "checkbox") {
+      var converted = new p5.Element(elt);
+      converted.checked = function(){
+      if (arguments.length === 0){
+        return this.elt.checked;
+      } else if(arguments[0]) {
+        this.elt.checked = true;
+      } else {
+        this.elt.checked = false;
+      }
+      return this;
+      };
+      return converted;
+    } else if (elt.tagName === "VIDEO" || elt.tagName === "AUDIO") {
+      return new p5.MediaElement(elt);
+    } else {
+      return new p5.Element(elt);
+    }
+  }
+
+  /**
+   * Removes all elements created by p5, except any canvas / graphics
+   * elements created by createCanvas or createGraphics.
+   * Event handlers are removed, and element is removed from the DOM.
+   * @method removeElements
+   * @example
+   * <div class='norender'><code>
+   * function setup() {
+   *   createCanvas(100, 100);
+   *   createDiv('this is some text');
+   *   createP('this is a paragraph');
+   * }
+   * function mousePressed() {
+   *   removeElements(); // this will remove the div and p, not canvas
+   * }
+   * </code></div>
+   *
+   */
+  p5.prototype.removeElements = function (e) {
+    for (var i=0; i<this._elements.length; i++) {
+      if (!(this._elements[i].elt instanceof HTMLCanvasElement)) {
+        this._elements[i].remove();
+      }
+    }
+  };
+
+  /**
+   * Helpers for create methods.
+   */
+  function addElement(elt, pInst, media) {
+    var node = pInst._userNode ? pInst._userNode : document.body;
+    node.appendChild(elt);
+    var c = media ? new p5.MediaElement(elt) : new p5.Element(elt);
+    pInst._elements.push(c);
+    return c;
+  }
+
+  /**
+   * Creates a &lt;div&gt;&lt;/div&gt; element in the DOM with given inner HTML.
+   * Appends to the container node if one is specified, otherwise
+   * appends to body.
+   *
+   * @method createDiv
+   * @param  {String} html inner HTML for element created
+   * @return {Object/p5.Element} pointer to p5.Element holding created node
+   * @example
+   * <div class='norender'><code>
+   * var myDiv;
+   * function setup() {
+   *   myDiv = createDiv('this is some text');
+   * }
+   * </code></div>
+   */
+
+  /**
+   * Creates a &lt;p&gt;&lt;/p&gt; element in the DOM with given inner HTML. Used
+   * for paragraph length text.
+   * Appends to the container node if one is specified, otherwise
+   * appends to body.
+   *
+   * @method createP
+   * @param  {String} html inner HTML for element created
+   * @return {Object/p5.Element} pointer to p5.Element holding created node
+   * @example
+   * <div class='norender'><code>
+   * var myP;
+   * function setup() {
+   *   myP = createP('this is some text');
+   * }
+   * </code></div>
+   */
+
+  /**
+   * Creates a &lt;span&gt;&lt;/span&gt; element in the DOM with given inner HTML.
+   * Appends to the container node if one is specified, otherwise
+   * appends to body.
+   *
+   * @method createSpan
+   * @param  {String} html inner HTML for element created
+   * @return {Object/p5.Element} pointer to p5.Element holding created node
+   * @example
+   * <div class='norender'><code>
+   * var mySpan;
+   * function setup() {
+   *   mySpan = createSpan('this is some text');
+   * }
+   * </code></div>
+   */
+  var tags = ['div', 'p', 'span'];
+  tags.forEach(function(tag) {
+    var method = 'create' + tag.charAt(0).toUpperCase() + tag.slice(1);
+    p5.prototype[method] = function(html) {
+      var elt = document.createElement(tag);
+      elt.innerHTML = typeof html === undefined ? "" : html;
+      return addElement(elt, this);
+    }
+  });
+
+  /**
+   * Creates an &lt;img /&gt; element in the DOM with given src and
+   * alternate text.
+   * Appends to the container node if one is specified, otherwise
+   * appends to body.
+   *
+   * @method createImg
+   * @param  {String} src src path or url for image
+   * @param  {String} [alt] alternate text to be used if image does not load
+   * @param  {Function} [successCallback] callback to be called once image data is loaded
+   * @return {Object/p5.Element} pointer to p5.Element holding created node
+   * @example
+   * <div class='norender'><code>
+   * var img;
+   * function setup() {
+   *   img = createImg('http://p5js.org/img/asterisk-01.png');
+   * }
+   * </code></div>
+   */
+  p5.prototype.createImg = function() {
+    var elt = document.createElement('img');
+    var args = arguments;
+    var self;
+    var setAttrs = function(){
+      self.width = elt.offsetWidth;
+      self.height = elt.offsetHeight;
+      if (args.length > 1 && typeof args[1] === 'function'){
+        self.fn = args[1];
+        self.fn();
+      }else if (args.length > 1 && typeof args[2] === 'function'){
+        self.fn = args[2];
+        self.fn();
+      }
+    };
+    elt.src = args[0];
+    if (args.length > 1 && typeof args[1] === 'string'){
+      elt.alt = args[1];
+    }
+    elt.onload = function(){
+      setAttrs();
+    }
+    self = addElement(elt, this);
+    return self;
+  };
+
+  /**
+   * Creates an &lt;a&gt;&lt;/a&gt; element in the DOM for including a hyperlink.
+   * Appends to the container node if one is specified, otherwise
+   * appends to body.
+   *
+   * @method createA
+   * @param  {String} href       url of page to link to
+   * @param  {String} html       inner html of link element to display
+   * @param  {String} [target]   target where new link should open,
+   *                             could be _blank, _self, _parent, _top.
+   * @return {Object/p5.Element} pointer to p5.Element holding created node
+   * @example
+   * <div class='norender'><code>
+   * var myLink;
+   * function setup() {
+   *   myLink = createA('http://p5js.org/', 'this is a link');
+   * }
+   * </code></div>
+   */
+  p5.prototype.createA = function(href, html, target) {
+    var elt = document.createElement('a');
+    elt.href = href;
+    elt.innerHTML = html;
+    if (target) elt.target = target;
+    return addElement(elt, this);
+  };
+
+  /** INPUT **/
+
+
+  /**
+   * Creates a slider &lt;input&gt;&lt;/input&gt; element in the DOM.
+   * Use .size() to set the display length of the slider.
+   * Appends to the container node if one is specified, otherwise
+   * appends to body.
+   *
+   * @method createSlider
+   * @param  {Number} min minimum value of the slider
+   * @param  {Number} max maximum value of the slider
+   * @param  {Number} [value] default value of the slider
+   * @return {Object/p5.Element} pointer to p5.Element holding created node
+   * @example
+   * <div><code>
+   * var slider;
+   * function setup() {
+   *   slider = createSlider(0, 255, 100);
+   *   slider.position(10, 10);
+   *   slider.style('width', '80px');
+   * }
+   *
+   * function draw() {
+   *   var val = slider.value();
+   *   background(val);
+   * }
+   * </code></div>
+   */
+  p5.prototype.createSlider = function(min, max, value, step) {
+    var elt = document.createElement('input');
+    elt.type = 'range';
+    elt.min = min;
+    elt.max = max;
+    if (step) elt.step = step;
+    if (typeof(value) === "number") elt.value = value;
+    return addElement(elt, this);
+  };
+
+  /**
+   * Creates a &lt;button&gt;&lt;/button&gt; element in the DOM.
+   * Use .size() to set the display size of the button.
+   * Use .mousePressed() to specify behavior on press.
+   * Appends to the container node if one is specified, otherwise
+   * appends to body.
+   *
+   * @method createButton
+   * @param  {String} label label displayed on the button
+   * @param  {String} [value] value of the button
+   * @return {Object/p5.Element} pointer to p5.Element holding created node
+   * @example
+   * <div class='norender'><code>
+   * var button;
+   * function setup() {
+   *   createCanvas(100, 100);
+   *   background(0);
+   *   button = createButton('click me');
+   *   button.position(19, 19);
+   *   button.mousePressed(changeBG);
+   * }
+   *
+   * function changeBG() {
+   *   var val = random(255);
+   *   background(val);
+   * }
+   * </code></div>
+   */
+  p5.prototype.createButton = function(label, value) {
+    var elt = document.createElement('button');
+    elt.innerHTML = label;
+    elt.value = value;
+    if (value) elt.value = value;
+    return addElement(elt, this);
+  };
+
+  /**
+   * Creates a checkbox &lt;input&gt;&lt;/input&gt; element in the DOM.
+   * Calling .checked() on a checkbox returns if it is checked or not
+   *
+   * @method createCheckbox
+   * @param  {String} [label] label displayed after checkbox
+   * @param  {boolean} [value] value of the checkbox; checked is true, unchecked is false.Unchecked if no value given
+   * @return {Object/p5.Element} pointer to p5.Element holding created node
+   * @example
+   * <div class='norender'><code>
+   * var checkbox;
+   *
+   * function setup() {
+   *   checkbox = createCheckbox('label', false);
+   *   checkbox.changed(myCheckedEvent);
+   * }
+   *
+   * function myCheckedEvent() {
+   *   if (this.checked()) {
+   *     console.log("Unchecking!");
+   *   } else {
+   *     console.log("Checking!");
+   *   }
+   *
+   * </code></div>
+   */
+  p5.prototype.createCheckbox = function() {
+    var elt = document.createElement('input');
+    elt.type = 'checkbox';
+    //checkbox must be wrapped in p5.Element before label so that label appears after
+    var self = addElement(elt, this);
+    self.checked = function(){
+      if (arguments.length === 0){
+        return self.elt.checked;
+      }else if(arguments[0]){
+        self.elt.checked = true;
+      }else{
+        self.elt.checked = false;
+      }
+      return self;
+    };
+    this.value = function(val){
+      self.value = val;
+      return this;
+    };
+    if (arguments[0]){
+      var ran = Math.random().toString(36).slice(2);
+      var label = document.createElement('label');
+      elt.setAttribute('id', ran);
+      label.htmlFor = ran;
+      self.value(arguments[0]);
+      label.appendChild(document.createTextNode(arguments[0]));
+      addElement(label, this);
+    }
+    if (arguments[1]){
+      elt.checked = true;
+    }
+    return self;
+  };
+
+  /**
+   * Creates a dropdown menu &lt;select&gt;&lt;/select&gt; element in the DOM.
+   * @method createSelect
+   * @param {boolean} [multiple] [true if dropdown should support multiple selections]
+   * @return {Object/p5.Element} pointer to p5.Element holding created node
+   * @example
+   * <div><code>
+   * var sel;
+   *
+   * function setup() {
+   *   textAlign(CENTER);
+   *   background(200);
+   *   sel = createSelect();
+   *   sel.position(10, 10);
+   *   sel.option('pear');
+   *   sel.option('kiwi');
+   *   sel.option('grape');
+   *   sel.changed(mySelectEvent);
+   * }
+   *
+   * function mySelectEvent() {
+   *   var item = sel.value();
+   *   background(200);
+   *   text("it's a "+item+"!", 50, 50);
+   * }
+   * </code></div>
+   */
+  p5.prototype.createSelect = function(mult) {
+    var elt = document.createElement('select');
+    if (mult){
+      elt.setAttribute('multiple', 'true');
+    }
+    var self = addElement(elt, this);
+    self.option = function(name, value){
+      var opt = document.createElement('option');
+      opt.innerHTML = name;
+      if (arguments.length > 1)
+        opt.value = value;
+      else
+        opt.value = name;
+      elt.appendChild(opt);
+    };
+    self.selected = function(value){
+      var arr = [];
+      if (arguments.length > 0){
+        for (var i = 0; i < this.elt.length; i++){
+          if (value.toString() === this.elt[i].value){
+            this.elt.selectedIndex = i;
+          }
+        }
+        return this;
+      }else{
+        if (mult){
+          for (var i = 0; i < this.elt.selectedOptions.length; i++){
+            arr.push(this.elt.selectedOptions[i].value);
+          }
+          return arr;
+        }else{
+          return this.elt.value;
+        }
+      }
+    };
+    return self;
+  };
+
+  /**
+   * Creates a radio button &lt;input&gt;&lt;/input&gt; element in the DOM.
+   *
+   * @method createRadio
+   * @param  {String} [divId] the id and name of the created div and input field respectively
+   * @return {Object/p5.Element} pointer to p5.Element holding created node
+   */
+  p5.prototype.createRadio = function() {
+    var radios = document.querySelectorAll("input[type=radio]");
+    var count = 0;
+    if(radios.length > 1){
+      console.log(radios,radios[0].name);
+      var length = radios.length;
+      var prev=radios[0].name;
+      var current = radios[1].name;
+      count=1;
+      for(var i = 1; i < length; i++ ){
+        current = radios[i].name;
+        if(prev != current){
+          count++;
+        }
+        prev = current;
+      }
+    }
+    else if (radios.length == 1){
+      count = 1;
+    }
+    var elt = document.createElement('div');
+    var self = addElement(elt, this);
+    var times = -1;
+    self.option = function(name, value){
+      var opt = document.createElement('input');
+      opt.type = 'radio';
+      opt.innerHTML = name;
+      if (arguments.length > 1)
+        opt.value = value;
+      else
+        opt.value = name;
+      opt.setAttribute('name',"defaultradio"+count);
+      elt.appendChild(opt);
+      if (name){
+        times++;
+        var ran = Math.random().toString(36).slice(2);
+        var label = document.createElement('label');
+        opt.setAttribute('id', "defaultradio"+count+"-"+times);
+        label.htmlFor = "defaultradio"+count+"-"+times;
+        label.appendChild(document.createTextNode(name));
+        elt.appendChild(label);
+      }
+      return opt;
+    };
+    self.selected = function(){
+      var length = this.elt.childNodes.length;
+      if(arguments[0]) {
+        for (var i = 0; i < length; i+=2){
+          if(this.elt.childNodes[i].value == arguments[0])
+            this.elt.childNodes[i].checked = true;
+        }
+        return this;
+      } else {
+        for (var i = 0; i < length; i+=2){
+          if(this.elt.childNodes[i].checked == true)
+            return this.elt.childNodes[i].value;
+        }
+      }
+    };
+    self.value = function(){
+      var length = this.elt.childNodes.length;
+      if(arguments[0]) {
+        for (var i = 0; i < length; i+=2){
+          if(this.elt.childNodes[i].value == arguments[0])
+            this.elt.childNodes[i].checked = true;
+        }
+        return this;
+      } else {
+        for (var i = 0; i < length; i+=2){
+          if(this.elt.childNodes[i].checked == true)
+            return this.elt.childNodes[i].value;
+        }
+        return "";
+      }
+    };
+    return self
+  };
+
+  /**
+   * Creates an &lt;input&gt;&lt;/input&gt; element in the DOM for text input.
+   * Use .size() to set the display length of the box.
+   * Appends to the container node if one is specified, otherwise
+   * appends to body.
+   *
+   * @method createInput
+   * @param  {Number} [value] default value of the input box
+   * @return {Object/p5.Element} pointer to p5.Element holding created node
+   * @example
+   * <div class='norender'><code>
+   * function setup(){
+   *   var inp = createInput('');
+   *   inp.input(myInputEvent);
+   * }
+   *
+   * function myInputEvent(){
+   *   console.log('you are typing: ', this.value());
+   * }
+   *
+   * </code></div>
+   */
+  p5.prototype.createInput = function(value) {
+    var elt = document.createElement('input');
+    elt.type = 'text';
+    if (value) elt.value = value;
+    return addElement(elt, this);
+  };
+
+  /**
+   * Creates an &lt;input&gt;&lt;/input&gt; element in the DOM of type 'file'.
+   * This allows users to select local files for use in a sketch.
+   *
+   * @method createFileInput
+   * @param  {Function} [callback] callback function for when a file loaded
+   * @param  {String} [multiple] optional to allow multiple files selected
+   * @return {Object/p5.Element} pointer to p5.Element holding created DOM element
+   */
+  p5.prototype.createFileInput = function(callback, multiple) {
+
+    // Is the file stuff supported?
+    if (window.File && window.FileReader && window.FileList && window.Blob) {
+      // Yup, we're ok and make an input file selector
+      var elt = document.createElement('input');
+      elt.type = 'file';
+
+      // If we get a second argument that evaluates to true
+      // then we are looking for multiple files
+      if (multiple) {
+        // Anything gets the job done
+        elt.multiple = 'multiple';
+      }
+
+      // Function to handle when a file is selected
+      // We're simplifying life and assuming that we always
+      // want to load every selected file
+      function handleFileSelect(evt) {
+        // These are the files
+        var files = evt.target.files;
+        // Load each one and trigger a callback
+        for (var i = 0; i < files.length; i++) {
+          var f = files[i];
+          var reader = new FileReader();
+          function makeLoader(theFile) {
+            // Making a p5.File object
+            var p5file = new p5.File(theFile);
+            return function(e) {
+              p5file.data = e.target.result;
+              callback(p5file);
+            };
+          };
+          reader.onload = makeLoader(f);
+
+          // Text or data?
+          // This should likely be improved
+          if (f.type.indexOf('text') > -1) {
+            reader.readAsText(f);
+          } else {
+            reader.readAsDataURL(f);
+          }
+        }
+      }
+
+      // Now let's handle when a file was selected
+      elt.addEventListener('change', handleFileSelect, false);
+      return addElement(elt, this);
+    } else {
+      console.log('The File APIs are not fully supported in this browser. Cannot create element.');
+    }
+  };
+
+
+  /** VIDEO STUFF **/
+
+  function createMedia(pInst, type, src, callback) {
+    var elt = document.createElement(type);
+
+    // allow src to be empty
+    var src = src || '';
+    if (typeof src === 'string') {
+      src = [src];
+    }
+    for (var i=0; i<src.length; i++) {
+      var source = document.createElement('source');
+      source.src = src[i];
+      elt.appendChild(source);
+    }
+    if (typeof callback !== 'undefined') {
+      var callbackHandler = function() {
+        callback();
+        elt.removeEventListener('canplaythrough', callbackHandler);
+      }
+      elt.addEventListener('canplaythrough', callbackHandler);
+    }
+
+    var c = addElement(elt, pInst, true);
+    c.loadedmetadata = false;
+    // set width and height onload metadata
+    elt.addEventListener('loadedmetadata', function() {
+      c.width = elt.videoWidth;
+      c.height = elt.videoHeight;
+      c.loadedmetadata = true;
+    });
+
+    return c;
+  }
+  /**
+   * Creates an HTML5 &lt;video&gt; element in the DOM for simple playback
+   * of audio/video. Shown by default, can be hidden with .hide()
+   * and drawn into canvas using video(). Appends to the container
+   * node if one is specified, otherwise appends to body. The first parameter
+   * can be either a single string path to a video file, or an array of string
+   * paths to different formats of the same video. This is useful for ensuring
+   * that your video can play across different browsers, as each supports
+   * different formats. See <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Supported_media_formats">this
+   * page</a> for further information about supported formats.
+   *
+   * @method createVideo
+   * @param  {String|Array} src  path to a video file, or array of paths for
+   *                             supporting different browsers
+   * @param  {Object} [callback] callback function to be called upon
+   *                             'canplaythrough' event fire, that is, when the
+   *                             browser can play the media, and estimates that
+   *                             enough data has been loaded to play the media
+   *                             up to its end without having to stop for
+   *                             further buffering of content
+   * @return {Object/p5.Element} pointer to video p5.Element
+   */
+  p5.prototype.createVideo = function(src, callback) {
+    return createMedia(this, 'video', src, callback);
+  };
+
+  /** AUDIO STUFF **/
+
+  /**
+   * Creates a hidden HTML5 &lt;audio&gt; element in the DOM for simple audio
+   * playback. Appends to the container node if one is specified,
+   * otherwise appends to body. The first parameter
+   * can be either a single string path to a audio file, or an array of string
+   * paths to different formats of the same audio. This is useful for ensuring
+   * that your audio can play across different browsers, as each supports
+   * different formats. See <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Supported_media_formats">this
+   * page for further information about supported formats</a>.
+   *
+   * @method createAudio
+   * @param  {String|Array} src  path to an audio file, or array of paths for
+   *                             supporting different browsers
+   * @param  {Object} [callback] callback function to be called upon
+   *                             'canplaythrough' event fire, that is, when the
+   *                             browser can play the media, and estimates that
+   *                             enough data has been loaded to play the media
+   *                             up to its end without having to stop for
+   *                             further buffering of content
+   * @return {Object/p5.Element} pointer to audio p5.Element
+   */
+  p5.prototype.createAudio = function(src, callback) {
+    return createMedia(this, 'audio', src, callback);
+  };
+
+
+  /** CAMERA STUFF **/
+
+  p5.prototype.VIDEO = 'video';
+  p5.prototype.AUDIO = 'audio';
+
+  navigator.getUserMedia  = navigator.getUserMedia ||
+                            navigator.webkitGetUserMedia ||
+                            navigator.mozGetUserMedia ||
+                            navigator.msGetUserMedia;
+
+  /**
+   * Creates a new &lt;video&gt; element that contains the audio/video feed
+   * from a webcam. This can be drawn onto the canvas using video(). More
+   * specific properties of the stream can be passing in a Constraints object.
+   * See the
+   * <a href="http://w3c.github.io/mediacapture-main/getusermedia.html">W3C
+   * spec</a> for possible properties. Note that not all of these are supported
+   * by all browsers.
+   *
+   * @method createCapture
+   * @param  {String|Constant|Object}   type type of capture, either VIDEO or
+   *                                    AUDIO if none specified, default both,
+   *                                    or a Constraints object
+   * @param  {Function}                 callback function to be called once
+   *                                    stream has loaded
+   * @return {Object/p5.Element} capture video p5.Element
+   * @example
+   * <div class='norender'><code>
+   * var capture;
+   *
+   * function setup() {
+   *   createCanvas(480, 120);
+   *   capture = createCapture(VIDEO);
+   * }
+   *
+   * function draw() {
+   *   image(capture, 0, 0, width, width*capture.height/capture.width);
+   *   filter(INVERT);
+   * }
+   * </code></div>
+   * <div class='norender'><code>
+   * function setup() {
+   *   createCanvas(480, 120);
+   *   var constraints = {
+   *     video: {
+   *       mandatory: {
+   *         minWidth: 1280,
+   *         minHeight: 720
+   *       },
+   *       optional: [
+   *         { maxFrameRate: 10 }
+   *       ]
+   *     },
+   *     audio: true
+   *   };
+   *   createCapture(constraints, function(stream) {
+   *     console.log(stream);
+   *   });
+   * }
+   * </code></div>
+   */
+  p5.prototype.createCapture = function() {
+    var useVideo = true;
+    var useAudio = true;
+    var constraints;
+    var cb;
+    for (var i=0; i<arguments.length; i++) {
+      if (arguments[i] === p5.prototype.VIDEO) {
+        useAudio = false;
+      } else if (arguments[i] === p5.prototype.AUDIO) {
+        useVideo = false;
+      } else if (typeof arguments[i] === 'object') {
+        constraints = arguments[i];
+      } else if (typeof arguments[i] === 'function') {
+        cb = arguments[i];
+      }
+    }
+
+    if (navigator.getUserMedia) {
+      var elt = document.createElement('video');
+
+      if (!constraints) {
+        constraints = {video: useVideo, audio: useAudio};
+      }
+
+      navigator.getUserMedia(constraints, function(stream) {
+        elt.src = window.URL.createObjectURL(stream);
+        elt.onloadedmetadata = function(e) {
+          elt.play();
+          if (cb) {
+            cb(stream);
+          }
+        };
+      }, function(e) { console.log(e); });
+    } else {
+      throw 'getUserMedia not supported in this browser';
+    }
+    var c = addElement(elt, this, true);
+    c.loadedmetadata = false;
+    // set width and height onload metadata
+    elt.addEventListener('loadedmetadata', function() {
+      c.width = elt.videoWidth;
+      c.height = elt.videoHeight;
+      c.loadedmetadata = true;
+    });
+    return c;
+  };
+
+  /**
+   * Creates element with given tag in the DOM with given content.
+   * Appends to the container node if one is specified, otherwise
+   * appends to body.
+   *
+   * @method createElement
+   * @param  {String} tag tag for the new element
+   * @param  {String} [content] html content to be inserted into the element
+   * @return {Object/p5.Element} pointer to p5.Element holding created node
+   * @example
+   * <div class='norender'><code>
+   * var h2 = createElement('h2','im an h2 p5.element!');
+   * </code></div>
+   */
+  p5.prototype.createElement = function(tag, content) {
+    var elt = document.createElement(tag);
+    if (typeof content !== 'undefined') {
+      elt.innerHTML = content;
+    }
+    return addElement(elt, this);
+  };
+
+
+// =============================================================================
+//                         p5.Element additions
+// =============================================================================
+  /**
+   *
+   * Adds specified class to the element.
+   *
+   * @for p5.Element
+   * @method addClass
+   * @param  {String} class name of class to add
+   * @return {Object/p5.Element}
+   * @example
+   * <div class='norender'><code>
+   * var div = createDiv('div');
+   * div.addClass('myClass');
+   * </code></div>
+   */
+  p5.Element.prototype.addClass = function(c) {
+    if (this.elt.className) {
+      // PEND don't add class more than once
+      //var regex = new RegExp('[^a-zA-Z\d:]?'+c+'[^a-zA-Z\d:]?');
+      //if (this.elt.className.search(/[^a-zA-Z\d:]?hi[^a-zA-Z\d:]?/) === -1) {
+      this.elt.className = this.elt.className+' '+c;
+      //}
+    } else {
+      this.elt.className = c;
+    }
+    return this;
+  }
+
+  /**
+   *
+   * Removes specified class from the element.
+   *
+   * @method removeClass
+   * @param  {String} class name of class to remove
+   * @return {Object/p5.Element}
+   */
+  p5.Element.prototype.removeClass = function(c) {
+    var regex = new RegExp('(?:^|\\s)'+c+'(?!\\S)');
+    this.elt.className = this.elt.className.replace(regex, '');
+    this.elt.className = this.elt.className.replace(/^\s+|\s+$/g, ""); //prettify (optional)
+    return this;
+  }
+
+  /**
+   *
+   * Attaches the element  as a child to the parent specified.
+   * Accepts either a string ID, DOM node, or p5.Element.
+   * If no argument is specified, an array of children DOM nodes is returned.
+   *
+   * @method child
+   * @param  {String|Object|p5.Element} [child] the ID, DOM node, or p5.Element
+   *                         to add to the current element
+   * @return {p5.Element}
+   * @example
+   * <div class='norender'><code>
+   * var div0 = createDiv('this is the parent');
+   * var div1 = createDiv('this is the child');
+   * div0.child(div1); // use p5.Element
+   * </code></div>
+   * <div class='norender'><code>
+   * var div0 = createDiv('this is the parent');
+   * var div1 = createDiv('this is the child');
+   * div1.id('apples');
+   * div0.child('apples'); // use id
+   * </code></div>
+   * <div class='norender'><code>
+   * var div0 = createDiv('this is the parent');
+   * var elt = document.getElementById('myChildDiv');
+   * div0.child(elt); // use element from page
+   * </code></div>
+   */
+  p5.Element.prototype.child = function(c) {
+    if (c === null){
+      return this.elt.childNodes
+    }
+    if (typeof c === 'string') {
+      if (c[0] === '#') {
+        c = c.substring(1);
+      }
+      c = document.getElementById(c);
+    } else if (c instanceof p5.Element) {
+      c = c.elt;
+    }
+    this.elt.appendChild(c);
+    return this;
+  };
+
+  /**
+   * Centers a p5 Element either vertically, horizontally,
+   * or both, relative to its parent or according to
+   * the body if the Element has no parent. If no argument is passed
+   * the Element is aligned both vertically and horizontally.
+   *
+   * @param  {String} align       passing 'vertical', 'horizontal' aligns element accordingly
+   * @return {Object/p5.Element} pointer to p5.Element
+   * @example
+   * <div><code>
+   * function setup() {
+   *   var div = createDiv('').size(10,10);
+   *   div.style('background-color','orange');
+   *   div.center();
+   *
+   * }
+   * </code></div>
+   */
+  p5.Element.prototype.center = function(align) {
+    var style = this.elt.style.display;
+    var hidden = this.elt.style.display === 'none';
+    var parentHidden = this.parent().style.display === 'none';
+    var pos = { x : this.elt.offsetLeft, y : this.elt.offsetTop };
+
+    if (hidden) this.show();
+
+    this.elt.style.display = 'block';
+    this.position(0,0);
+
+    if (parentHidden) this.parent().style.display = 'block';
+
+    var wOffset = Math.abs(this.parent().offsetWidth - this.elt.offsetWidth);
+    var hOffset = Math.abs(this.parent().offsetHeight - this.elt.offsetHeight);
+    var y = pos.y;
+    var x = pos.x;
+
+    if (align === 'both' || align === undefined){
+      this.position(wOffset/2, hOffset/2);
+    }else if (align === 'horizontal'){
+      this.position(wOffset/2, y);
+    }else if (align === 'vertical'){
+      this.position(x, hOffset/2);
+    }
+
+    this.style('display', style);
+
+    if (hidden) this.hide();
+
+    if (parentHidden) this.parent().style.display = 'none';
+
+    return this;
+  };
+
+  /**
+   *
+   * If an argument is given, sets the inner HTML of the element,
+   * replacing any existing html. If no arguments are given, returns
+   * the inner HTML of the element.
+   *
+   * @for p5.Element
+   * @method html
+   * @param  {String} [html] the HTML to be placed inside the element
+   * @return {Object/p5.Element|String}
+   * @example
+   * <div class='norender'><code>
+   * var div = createDiv('').size(100,100);
+   * div.style('background-color','orange');
+   * div.html('hi');
+   * </code></div>
+   */
+  p5.Element.prototype.html = function(html) {
+    if (typeof html !== 'undefined') {
+      this.elt.innerHTML = html;
+      return this;
+    } else {
+      return this.elt.innerHTML;
+    }
+  };
+
+  /**
+   *
+   * Sets the position of the element relative to (0, 0) of the
+   * window. Essentially, sets position:absolute and left and top
+   * properties of style. If no arguments given returns the x and y position
+   * of the element in an object.
+   *
+   * @method position
+   * @param  {Number} [x] x-position relative to upper left of window
+   * @param  {Number} [y] y-position relative to upper left of window
+   * @return {Object/p5.Element}
+   * @example
+   * <div><code class='norender'>
+   * function setup() {
+   *   var cnv = createCanvas(100, 100);
+   *   // positions canvas 50px to the right and 100px
+   *   // below upper left corner of the window
+   *   cnv.position(50, 100);
+   * }
+   * </code></div>
+   */
+  p5.Element.prototype.position = function() {
+    if (arguments.length === 0){
+      return { 'x' : this.elt.offsetLeft , 'y' : this.elt.offsetTop };
+    }else{
+      this.elt.style.position = 'absolute';
+      this.elt.style.left = arguments[0]+'px';
+      this.elt.style.top = arguments[1]+'px';
+      this.x = arguments[0];
+      this.y = arguments[1];
+      return this;
+    }
+  };
+
+  /* Helper method called by p5.Element.style() */
+  p5.Element.prototype._translate = function(){
+    this.elt.style.position = 'absolute';
+    // save out initial non-translate transform styling
+    var transform = '';
+    if (this.elt.style.transform) {
+      transform = this.elt.style.transform.replace(/translate3d\(.*\)/g, '');
+      transform = transform.replace(/translate[X-Z]?\(.*\)/g, '');
+    }
+    if (arguments.length === 2) {
+      this.elt.style.transform = 'translate('+arguments[0]+'px, '+arguments[1]+'px)';
+    } else if (arguments.length > 2) {
+      this.elt.style.transform = 'translate3d('+arguments[0]+'px,'+arguments[1]+'px,'+arguments[2]+'px)';
+      if (arguments.length === 3) {
+        this.elt.parentElement.style.perspective = '1000px';
+      } else {
+        this.elt.parentElement.style.perspective = arguments[3]+'px';
+      }
+    }
+    // add any extra transform styling back on end
+    this.elt.style.transform += transform;
+    return this;
+  };
+
+  /* Helper method called by p5.Element.style() */
+  p5.Element.prototype._rotate = function(){
+    // save out initial non-rotate transform styling
+    var transform = '';
+    if (this.elt.style.transform) {
+      var transform = this.elt.style.transform.replace(/rotate3d\(.*\)/g, '');
+      transform = transform.replace(/rotate[X-Z]?\(.*\)/g, '');
+    }
+
+    if (arguments.length === 1){
+      this.elt.style.transform = 'rotate('+arguments[0]+'deg)';
+    }else if (arguments.length === 2){
+      this.elt.style.transform = 'rotate('+arguments[0]+'deg, '+arguments[1]+'deg)';
+    }else if (arguments.length === 3){
+      this.elt.style.transform = 'rotateX('+arguments[0]+'deg)';
+      this.elt.style.transform += 'rotateY('+arguments[1]+'deg)';
+      this.elt.style.transform += 'rotateZ('+arguments[2]+'deg)';
+    }
+    // add remaining transform back on
+    this.elt.style.transform += transform;
+    return this;
+  };
+
+  /**
+   * Sets the given style (css) property (1st arg) of the element with the
+   * given value (2nd arg). If a single argument is given, .style()
+   * returns the value of the given property; however, if the single argument
+   * is given in css syntax ('text-align:center'), .style() sets the css
+   * appropriatly. .style() also handles 2d and 3d css transforms. If
+   * the 1st arg is 'rotate', 'translate', or 'position', the following arguments
+   * accept Numbers as values. ('translate', 10, 100, 50);
+   *
+   * @method style
+   * @param  {String} property   property to be set
+   * @param  {String|Number|p5.Color} [value]   value to assign to property
+   * @param  {String|Number} [value]   value to assign to property (rotate/translate)
+   * @param  {String|Number} [value]   value to assign to property (rotate/translate)
+   * @param  {String|Number} [value]   value to assign to property (translate)
+   * @return {String|Object/p5.Element} value of property, if no value is specified
+   * or p5.Element
+   * @example
+   * <div><code class="norender">
+   * var myDiv = createDiv("I like pandas.");
+   * myDiv.style("font-size", "18px");
+   * myDiv.style("color", "#ff0000");
+   * </code></div>
+   * <div><code class="norender">
+   * var col = color(25,23,200,50);
+   * var button = createButton("button");
+   * button.style("background-color", col);
+   * button.position(10, 10);
+   * </code></div>
+   * <div><code class="norender">
+   * var myDiv = createDiv("I like lizards.");
+   * myDiv.style("position", 20, 20);
+   * myDiv.style("rotate", 45);
+   * </code></div>
+   * <div><code class="norender">
+   * var myDiv;
+   * function setup() {
+   *   background(200);
+   *   myDiv = createDiv("I like gray.");
+   *   myDiv.position(20, 20);
+   * }
+   *
+   * function draw() {
+   *   myDiv.style("font-size", mouseX+"px");
+   * }
+   * </code></div>
+   */
+  p5.Element.prototype.style = function(prop, val) {
+    var self = this;
+
+    if (val instanceof p5.Color) {
+      val = 'rgba(' + val.levels[0] + ',' + val.levels[1] + ',' + val.levels[2] + ',' + val.levels[3]/255 + ')'
+    }
+
+    if (typeof val === 'undefined') {
+      if (prop.indexOf(':') === -1) {
+        var styles = window.getComputedStyle(self.elt);
+        var style = styles.getPropertyValue(prop);
+        return style;
+      } else {
+        var attrs = prop.split(';');
+        for (var i = 0; i < attrs.length; i++) {
+          var parts = attrs[i].split(':');
+          if (parts[0] && parts[1]) {
+            this.elt.style[parts[0].trim()] = parts[1].trim();
+          }
+        }
+      }
+    } else {
+      if (prop === 'rotate' || prop === 'translate' || prop === 'position'){
+        var trans = Array.prototype.shift.apply(arguments);
+        var f = this[trans] || this['_'+trans];
+        f.apply(this, arguments);
+      } else {
+        this.elt.style[prop] = val;
+        if (prop === 'width' || prop === 'height' || prop === 'left' || prop === 'top') {
+          var numVal = val.replace(/\D+/g, '');
+          this[prop] = parseInt(numVal, 10); // pend: is this necessary?
+        }
+      }
+    }
+    return this;
+  };
+
+
+  /**
+   *
+   * Adds a new attribute or changes the value of an existing attribute
+   * on the specified element. If no value is specified, returns the
+   * value of the given attribute, or null if attribute is not set.
+   *
+   * @method attribute
+   * @param  {String} attr       attribute to set
+   * @param  {String} [value]    value to assign to attribute
+   * @return {String|Object/p5.Element} value of attribute, if no value is
+   *                             specified or p5.Element
+   * @example
+   * <div class="norender"><code>
+   * var myDiv = createDiv("I like pandas.");
+   * myDiv.attribute("align", "center");
+   * </code></div>
+   */
+  p5.Element.prototype.attribute = function(attr, value) {
+    if (typeof value === 'undefined') {
+      return this.elt.getAttribute(attr);
+    } else {
+      this.elt.setAttribute(attr, value);
+      return this;
+    }
+  };
+
+
+  /**
+   * Either returns the value of the element if no arguments
+   * given, or sets the value of the element.
+   *
+   * @method value
+   * @param  {String|Number}     [value]
+   * @return {String|Object/p5.Element} value of element if no value is specified or p5.Element
+   * @example
+   * <div class='norender'><code>
+   * // gets the value
+   * var inp;
+   * function setup() {
+   *   inp = createInput('');
+   * }
+   *
+   * function mousePressed() {
+   *   print(inp.value());
+   * }
+   * </code></div>
+   * <div class='norender'><code>
+   * // sets the value
+   * var inp;
+   * function setup() {
+   *   inp = createInput('myValue');
+   * }
+   *
+   * function mousePressed() {
+   *   inp.value("myValue");
+   * }
+   * </code></div>
+   */
+  p5.Element.prototype.value = function() {
+    if (arguments.length > 0) {
+      this.elt.value = arguments[0];
+      return this;
+    } else {
+      if (this.elt.type === 'range') {
+        return parseFloat(this.elt.value);
+      }
+      else return this.elt.value;
+    }
+  };
+
+  /**
+   *
+   * Shows the current element. Essentially, setting display:block for the style.
+   *
+   * @method show
+   * @return {Object/p5.Element}
+   * @example
+   * <div class='norender'><code>
+   * var div = createDiv('div');
+   * div.attribute("display", "none");
+   * div.show(); // turns display to block
+   * </code></div>
+   */
+  p5.Element.prototype.show = function() {
+    this.elt.style.display = 'block';
+    return this;
+  };
+
+  /**
+   * Hides the current element. Essentially, setting display:none for the style.
+   *
+   * @method hide
+   * @return {Object/p5.Element}
+   * @example
+   * <div class='norender'><code>
+   * var div = createDiv('this is a div');
+   * div.hide();
+   * </code></div>
+   */
+  p5.Element.prototype.hide = function() {
+    this.elt.style.display = 'none';
+    return this;
+  };
+
+  /**
+   *
+   * Sets the width and height of the element. AUTO can be used to
+   * only adjust one dimension. If no arguments given returns the width and height
+   * of the element in an object.
+   *
+   * @method size
+   * @param  {Number} [w] width of the element
+   * @param  {Number} [h] height of the element
+   * @return {Object/p5.Element}
+   * @example
+   * <div class='norender'><code>
+   * var div = createDiv('this is a div');
+   * div.size(100, 100);
+   * </code></div>
+   */
+  p5.Element.prototype.size = function(w, h) {
+    if (arguments.length === 0){
+      return { 'width' : this.elt.offsetWidth , 'height' : this.elt.offsetHeight };
+    }else{
+      var aW = w;
+      var aH = h;
+      var AUTO = p5.prototype.AUTO;
+      if (aW !== AUTO || aH !== AUTO) {
+        if (aW === AUTO) {
+          aW = h * this.width / this.height;
+        } else if (aH === AUTO) {
+          aH = w * this.height / this.width;
+        }
+        // set diff for cnv vs normal div
+        if (this.elt instanceof HTMLCanvasElement) {
+          var j = {};
+          var k  = this.elt.getContext('2d');
+          for (var prop in k) {
+            j[prop] = k[prop];
+          }
+          this.elt.setAttribute('width', aW * this._pInst._pixelDensity);
+          this.elt.setAttribute('height', aH * this._pInst._pixelDensity);
+          this.elt.setAttribute('style', 'width:' + aW + 'px; height:' + aH + 'px');
+          this._pInst.scale(this._pInst._pixelDensity, this._pInst._pixelDensity);
+          for (var prop in j) {
+            this.elt.getContext('2d')[prop] = j[prop];
+          }
+        } else {
+          this.elt.style.width = aW+'px';
+          this.elt.style.height = aH+'px';
+          this.elt.width = aW;
+          this.elt.height = aH;
+          this.width = aW;
+          this.height = aH;
+        }
+
+        this.width = this.elt.offsetWidth;
+        this.height = this.elt.offsetHeight;
+
+        if (this._pInst) { // main canvas associated with p5 instance
+          if (this._pInst._curElement.elt === this.elt) {
+            this._pInst._setProperty('width', this.elt.offsetWidth);
+            this._pInst._setProperty('height', this.elt.offsetHeight);
+          }
+        }
+      }
+      return this;
+    }
+  };
+
+  /**
+   * Removes the element and deregisters all listeners.
+   * @method remove
+   * @example
+   * <div class='norender'><code>
+   * var myDiv = createDiv('this is some text');
+   * myDiv.remove();
+   * </code></div>
+   */
+  p5.Element.prototype.remove = function() {
+    // deregister events
+    for (var ev in this._events) {
+      this.elt.removeEventListener(ev, this._events[ev]);
+    }
+    if (this.elt.parentNode) {
+      this.elt.parentNode.removeChild(this.elt);
+    }
+    delete(this);
+  };
+
+
+
+// =============================================================================
+//                         p5.MediaElement additions
+// =============================================================================
+
+
+  /**
+   * Extends p5.Element to handle audio and video. In addition to the methods
+   * of p5.Element, it also contains methods for controlling media. It is not
+   * called directly, but p5.MediaElements are created by calling createVideo,
+   * createAudio, and createCapture.
+   *
+   * @class p5.MediaElement
+   * @constructor
+   * @param {String} elt DOM node that is wrapped
+   * @param {Object} [pInst] pointer to p5 instance
+   */
+  p5.MediaElement = function(elt, pInst) {
+    p5.Element.call(this, elt, pInst);
+
+    var self = this;
+    this.elt.crossOrigin = 'anonymous';
+
+    this._prevTime = 0;
+    this._cueIDCounter = 0;
+    this._cues = [];
+    this._pixelDensity = 1;
+
+    /**
+     *  Path to the media element source.
+     *
+     *  @property src
+     *  @return {String} src
+     */
+    Object.defineProperty(self, 'src', {
+      get: function() {
+        var firstChildSrc = self.elt.children[0].src;
+        var srcVal = self.elt.src === window.location.href ? '' : self.elt.src;
+        var ret = firstChildSrc === window.location.href ? srcVal : firstChildSrc;
+        return ret;
+      },
+      set: function(newValue) {
+        for (var i = 0; i < self.elt.children.length; i++) {
+          self.elt.removeChild(self.elt.children[i]);
+        }
+        var source = document.createElement('source');
+        source.src = newValue;
+        elt.appendChild(source);
+        self.elt.src = newValue;
+      },
+    });
+
+    // private _onended callback, set by the method: onended(callback)
+    self._onended = function() {};
+    self.elt.onended = function() {
+      self._onended(self);
+    }
+  };
+  p5.MediaElement.prototype = Object.create(p5.Element.prototype);
+
+
+
+
+  /**
+   * Play an HTML5 media element.
+   *
+   * @method play
+   * @return {Object/p5.Element}
+   */
+  p5.MediaElement.prototype.play = function() {
+    if (this.elt.currentTime === this.elt.duration) {
+      this.elt.currentTime = 0;
+    }
+
+    if (this.elt.readyState > 1) {
+      this.elt.play();
+    } else {
+      // in Chrome, playback cannot resume after being stopped and must reload
+      this.elt.load();
+      this.elt.play();
+    }
+    return this;
+  };
+
+  /**
+   * Stops an HTML5 media element (sets current time to zero).
+   *
+   * @method stop
+   * @return {Object/p5.Element}
+   */
+  p5.MediaElement.prototype.stop = function() {
+    this.elt.pause();
+    this.elt.currentTime = 0;
+    return this;
+  };
+
+  /**
+   * Pauses an HTML5 media element.
+   *
+   * @method pause
+   * @return {Object/p5.Element}
+   */
+  p5.MediaElement.prototype.pause = function() {
+    this.elt.pause();
+    return this;
+  };
+
+  /**
+   * Set 'loop' to true for an HTML5 media element, and starts playing.
+   *
+   * @method loop
+   * @return {Object/p5.Element}
+   */
+  p5.MediaElement.prototype.loop = function() {
+    this.elt.setAttribute('loop', true);
+    this.play();
+    return this;
+  };
+  /**
+   * Set 'loop' to false for an HTML5 media element. Element will stop
+   * when it reaches the end.
+   *
+   * @method noLoop
+   * @return {Object/p5.Element}
+   */
+  p5.MediaElement.prototype.noLoop = function() {
+    this.elt.setAttribute('loop', false);
+    return this;
+  };
+
+
+  /**
+   * Set HTML5 media element to autoplay or not.
+   *
+   * @method autoplay
+   * @param {Boolean} autoplay whether the element should autoplay
+   * @return {Object/p5.Element}
+   */
+  p5.MediaElement.prototype.autoplay = function(val) {
+    this.elt.setAttribute('autoplay', val);
+    return this;
+  };
+
+  /**
+   * Sets volume for this HTML5 media element. If no argument is given,
+   * returns the current volume.
+   *
+   * @param {Number}            [val] volume between 0.0 and 1.0
+   * @return {Number|p5.MediaElement} current volume or p5.MediaElement
+   * @method volume
+   */
+  p5.MediaElement.prototype.volume = function(val) {
+    if (typeof val === 'undefined') {
+      return this.elt.volume;
+    } else {
+      this.elt.volume = val;
+    }
+  };
+
+  /**
+   * If no arguments are given, returns the current playback speed of the
+   * element. The speed parameter sets the speed where 2.0 will play the
+   * element twice as fast, 0.5 will play at half the speed, and -1 will play
+   * the element in normal speed in reverse.(Note that not all browsers support
+   * backward playback and even if they do, playback might not be smooth.)
+   *
+   * @method speed
+   * @param {Number} [speed]  speed multiplier for element playback
+   * @return {Number|Object/p5.MediaElement} current playback speed or p5.MediaElement
+   */
+  p5.MediaElement.prototype.speed = function(val) {
+    if (typeof val === 'undefined') {
+      return this.elt.playbackRate;
+    } else {
+      this.elt.playbackRate = val;
+    }
+  };
+
+  /**
+   * If no arguments are given, returns the current time of the element.
+   * If an argument is given the current time of the element is set to it.
+   *
+   * @method time
+   * @param {Number} [time] time to jump to (in seconds)
+   * @return {Number|Object/p5.MediaElement} current time (in seconds)
+   *                                  or p5.MediaElement
+   */
+  p5.MediaElement.prototype.time = function(val) {
+    if (typeof val === 'undefined') {
+      return this.elt.currentTime;
+    } else {
+      this.elt.currentTime = val;
+    }
+  };
+
+  /**
+   * Returns the duration of the HTML5 media element.
+   *
+   * @method duration
+   * @return {Number} duration
+   */
+  p5.MediaElement.prototype.duration = function() {
+    return this.elt.duration;
+  };
+  p5.MediaElement.prototype.pixels = [];
+  p5.MediaElement.prototype.loadPixels = function() {
+    if (!this.canvas) {
+      this.canvas = document.createElement('canvas');
+      this.drawingContext = this.canvas.getContext('2d');
+    }
+    if (this.loadedmetadata) { // wait for metadata for w/h
+      if (this.canvas.width !== this.elt.videoWidth) {
+        this.canvas.width = this.elt.videoWidth;
+        this.canvas.height = this.elt.videoHeight;
+        this.width = this.canvas.width;
+        this.height = this.canvas.height;
+      }
+      this.drawingContext.drawImage(this.elt, 0, 0, this.canvas.width, this.canvas.height);
+      p5.Renderer2D.prototype.loadPixels.call(this);
+    }
+    return this;
+  }
+  p5.MediaElement.prototype.updatePixels =  function(x, y, w, h){
+    if (this.loadedmetadata) { // wait for metadata
+      p5.Renderer2D.prototype.updatePixels.call(this, x, y, w, h);
+    }
+    return this;
+  }
+  p5.MediaElement.prototype.get = function(x, y, w, h){
+    if (this.loadedmetadata) { // wait for metadata
+      return p5.Renderer2D.prototype.get.call(this, x, y, w, h);
+    } else return [0, 0, 0, 255];
+  };
+  p5.MediaElement.prototype.set = function(x, y, imgOrCol){
+    if (this.loadedmetadata) { // wait for metadata
+      p5.Renderer2D.prototype.set.call(this, x, y, imgOrCol);
+    }
+  };
+  /**
+   *  Schedule an event to be called when the audio or video
+   *  element reaches the end. If the element is looping,
+   *  this will not be called. The element is passed in
+   *  as the argument to the onended callback.
+   *
+   *  @method  onended
+   *  @param  {Function} callback function to call when the
+   *                              soundfile has ended. The
+   *                              media element will be passed
+   *                              in as the argument to the
+   *                              callback.
+   *  @return {Object/p5.MediaElement}
+   *  @example
+   *  <div><code>
+   *  function setup() {
+   *    audioEl = createAudio('assets/beat.mp3');
+   *    audioEl.showControls(true);
+   *    audioEl.onended(sayDone);
+   *  }
+   *
+   *  function sayDone(elt) {
+   *    alert('done playing ' + elt.src );
+   *  }
+   *  </code></div>
+   */
+  p5.MediaElement.prototype.onended = function(callback) {
+    this._onended = callback;
+    return this;
+  };
+
+
+  /*** CONNECT TO WEB AUDIO API / p5.sound.js ***/
+
+  /**
+   *  Send the audio output of this element to a specified audioNode or
+   *  p5.sound object. If no element is provided, connects to p5's master
+   *  output. That connection is established when this method is first called.
+   *  All connections are removed by the .disconnect() method.
+   *
+   *  This method is meant to be used with the p5.sound.js addon library.
+   *
+   *  @method  connect
+   *  @param  {AudioNode|p5.sound object} audioNode AudioNode from the Web Audio API,
+   *  or an object from the p5.sound library
+   */
+  p5.MediaElement.prototype.connect = function(obj) {
+    var audioContext, masterOutput;
+
+    // if p5.sound exists, same audio context
+    if (typeof p5.prototype.getAudioContext === 'function') {
+      audioContext = p5.prototype.getAudioContext();
+      masterOutput = p5.soundOut.input;
+    } else {
+      try {
+        audioContext = obj.context;
+        masterOutput = audioContext.destination
+      } catch(e) {
+        throw 'connect() is meant to be used with Web Audio API or p5.sound.js'
+      }
+    }
+
+    // create a Web Audio MediaElementAudioSourceNode if none already exists
+    if (!this.audioSourceNode) {
+      this.audioSourceNode = audioContext.createMediaElementSource(this.elt);
+
+      // connect to master output when this method is first called
+      this.audioSourceNode.connect(masterOutput);
+    }
+
+    // connect to object if provided
+    if (obj) {
+      if (obj.input) {
+        this.audioSourceNode.connect(obj.input);
+      } else {
+        this.audioSourceNode.connect(obj);
+      }
+    }
+
+    // otherwise connect to master output of p5.sound / AudioContext
+    else {
+      this.audioSourceNode.connect(masterOutput);
+    }
+
+  };
+
+  /**
+   *  Disconnect all Web Audio routing, including to master output.
+   *  This is useful if you want to re-route the output through
+   *  audio effects, for example.
+   *
+   *  @method  disconnect
+   */
+  p5.MediaElement.prototype.disconnect = function() {
+    if (this.audioSourceNode) {
+      this.audioSourceNode.disconnect();
+    } else {
+      throw 'nothing to disconnect';
+    }
+  };
+
+
+  /*** SHOW / HIDE CONTROLS ***/
+
+  /**
+   *  Show the default MediaElement controls, as determined by the web browser.
+   *
+   *  @method  showControls
+   */
+  p5.MediaElement.prototype.showControls = function() {
+    // must set style for the element to show on the page
+    this.elt.style['text-align'] = 'inherit';
+    this.elt.controls = true;
+  };
+
+  /**
+   *  Hide the default mediaElement controls.
+   *
+   *  @method hideControls
+   */
+  p5.MediaElement.prototype.hideControls = function() {
+    this.elt.controls = false;
+  };
+
+  /*** SCHEDULE EVENTS ***/
+
+  /**
+   *  Schedule events to trigger every time a MediaElement
+   *  (audio/video) reaches a playback cue point.
+   *
+   *  Accepts a callback function, a time (in seconds) at which to trigger
+   *  the callback, and an optional parameter for the callback.
+   *
+   *  Time will be passed as the first parameter to the callback function,
+   *  and param will be the second parameter.
+   *
+   *
+   *  @method  addCue
+   *  @param {Number}   time     Time in seconds, relative to this media
+   *                             element's playback. For example, to trigger
+   *                             an event every time playback reaches two
+   *                             seconds, pass in the number 2. This will be
+   *                             passed as the first parameter to
+   *                             the callback function.
+   *  @param {Function} callback Name of a function that will be
+   *                             called at the given time. The callback will
+   *                             receive time and (optionally) param as its
+   *                             two parameters.
+   *  @param {Object} [value]    An object to be passed as the
+   *                             second parameter to the
+   *                             callback function.
+   *  @return {Number} id ID of this cue,
+   *                      useful for removeCue(id)
+   *  @example
+   *  <div><code>
+   *  function setup() {
+   *    background(255,255,255);
+   *
+   *    audioEl = createAudio('assets/beat.mp3');
+   *    audioEl.showControls();
+   *
+   *    // schedule three calls to changeBackground
+   *    audioEl.addCue(0.5, changeBackground, color(255,0,0) );
+   *    audioEl.addCue(1.0, changeBackground, color(0,255,0) );
+   *    audioEl.addCue(2.5, changeBackground, color(0,0,255) );
+   *    audioEl.addCue(3.0, changeBackground, color(0,255,255) );
+   *    audioEl.addCue(4.2, changeBackground, color(255,255,0) );
+   *    audioEl.addCue(5.0, changeBackground, color(255,255,0) );
+   *  }
+   *
+   *  function changeBackground(val) {
+   *    background(val);
+   *  }
+   *  </code></div>
+   */
+  p5.MediaElement.prototype.addCue = function(time, callback, val) {
+    var id = this._cueIDCounter++;
+
+    var cue = new Cue(callback, time, id, val);
+    this._cues.push(cue);
+
+    if (!this.elt.ontimeupdate) {
+      this.elt.ontimeupdate = this._onTimeUpdate.bind(this);
+    }
+
+    return id;
+  };
+
+  /**
+   *  Remove a callback based on its ID. The ID is returned by the
+   *  addCue method.
+   *
+   *  @method removeCue
+   *  @param  {Number} id ID of the cue, as returned by addCue
+   */
+  p5.MediaElement.prototype.removeCue = function(id) {
+    for (var i = 0; i < this._cues.length; i++) {
+      var cue = this._cues[i];
+      if (cue.id === id) {
+        this.cues.splice(i, 1);
+      }
+    }
+
+    if (this._cues.length === 0) {
+      this.elt.ontimeupdate = null
+    }
+  };
+
+  /**
+   *  Remove all of the callbacks that had originally been scheduled
+   *  via the addCue method.
+   *
+   *  @method  clearCues
+   */
+  p5.MediaElement.prototype.clearCues = function() {
+    this._cues = [];
+    this.elt.ontimeupdate = null;
+  };
+
+  // private method that checks for cues to be fired if events
+  // have been scheduled using addCue(callback, time).
+  p5.MediaElement.prototype._onTimeUpdate = function() {
+    var playbackTime = this.time();
+
+    for (var i = 0 ; i < this._cues.length; i++) {
+      var callbackTime = this._cues[i].time;
+      var val = this._cues[i].val;
+
+
+      if (this._prevTime < callbackTime && callbackTime <= playbackTime) {
+
+        // pass the scheduled callbackTime as parameter to the callback
+        this._cues[i].callback(val);
+      }
+
+    }
+
+    this._prevTime = playbackTime;
+  };
+
+
+  // Cue inspired by JavaScript setTimeout, and the
+  // Tone.js Transport Timeline Event, MIT License Yotam Mann 2015 tonejs.org
+  var Cue = function(callback, time, id, val) {
+    this.callback = callback;
+    this.time = time;
+    this.id = id;
+    this.val = val;
+  };
+
+// =============================================================================
+//                         p5.File
+// =============================================================================
+
+
+  /**
+   * Base class for a file
+   * Using this for createFileInput
+   *
+   * @class p5.File
+   * @constructor
+   * @param {File} file File that is wrapped
+   * @param {Object} [pInst] pointer to p5 instance
+   */
+  p5.File = function(file, pInst) {
+    /**
+     * Underlying File object. All normal File methods can be called on this.
+     *
+     * @property file
+     */
+    this.file = file;
+
+    this._pInst = pInst;
+
+    // Splitting out the file type into two components
+    // This makes determining if image or text etc simpler
+    var typeList = file.type.split('/');
+    /**
+     * File type (image, text, etc.)
+     *
+     * @property type
+     */
+    this.type = typeList[0];
+    /**
+     * File subtype (usually the file extension jpg, png, xml, etc.)
+     *
+     * @property subtype
+     */
+    this.subtype = typeList[1];
+    /**
+     * File name
+     *
+     * @property name
+     */
+    this.name = file.name;
+    /**
+     * File size
+     *
+     * @property size
+     */
+    this.size = file.size;
+
+    /**
+     * URL string containing image data.
+     *
+     * @property data
+     */
+    this.data = undefined;
+  };
+
+}));@method keyPressed
+ * @example
+ * <div>
+ * <code>
+ * var value = 0;
+ * function draw() {
+ *   fill(value);
+ *   rect(25, 25, 50, 50);
+ * }
+ * function keyPressed() {
+ *   if (value === 0) {
+ *     value = 255;
+ *   } else {
+ *     value = 0;
+ *   }
+ * }
+ * </code>
+ * </div>
+ * <div>
+ * <code>
+ * var value = 0;
+ * function draw() {
+ *   fill(value);
+ *   rect(25, 25, 50, 50);
+ * }
+ * function keyPressed() {
+ *   if (keyCode === LEFT_ARROW) {
+ *     value = 255;
+ *   } else if (keyCode === RIGHT_ARROW) {
+ *     value = 0;
+ *   }
+ * }
+ * </code>
+ * </div>
+ * <div class="norender">
+ * <code>
+ * function keyPressed(){
+ *   // Do something
+ *   return false; // prevent any default behaviour
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype._onkeydown = function (e) {
+  if (downKeys[e.which]) { // prevent multiple firings
+    return;
+  }
+  this._setProperty('isKeyPressed', true);
+  this._setProperty('keyIsPressed', true);
+  this._setProperty('keyCode', e.which);
+  downKeys[e.which] = true;
+  var key = String.fromCharCode(e.which);
+  if (!key) {
+    key = e.which;
+  }
+  this._setProperty('key', key);
+  var keyPressed = this.keyPressed || window.keyPressed;
+  if (typeof keyPressed === 'function' && !e.charCode) {
+    var executeDefault = keyPressed(e);
+    if(executeDefault === false) {
+      e.preventDefault();
+    }
+  }
+};
+/**
+ * The keyReleased() function is called once every time a key is released.
+ * See key and keyCode for more information.<br><br>
+ * Browsers may have different default
+ * behaviors attached to various key events. To prevent any default
+ * behavior for this event, add "return false" to the end of the method.
+ *
+ * @method keyReleased
+ * @example
+ * <div>
+ * <code>
+ * var value = 0;
+ * function draw() {
+ *   fill(value);
+ *   rect(25, 25, 50, 50);
+ * }
+ * function keyReleased() {
+ *   if (value === 0) {
+ *     value = 255;
+ *   } else {
+ *     value = 0;
+ *   }
+ *   return false; // prevent any default behavior
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype._onkeyup = function (e) {
+  var keyReleased = this.keyReleased || window.keyReleased;
+  this._setProperty('isKeyPressed', false);
+  this._setProperty('keyIsPressed', false);
+  this._setProperty('_lastKeyCodeTyped', null);
+  downKeys[e.which] = false;
+  //delete this._downKeys[e.which];
+  var key = String.fromCharCode(e.which);
+  if (!key) {
+    key = e.which;
+  }
+  this._setProperty('key', key);
+  this._setProperty('keyCode', e.which);
+  if (typeof keyReleased === 'function') {
+    var executeDefault = keyReleased(e);
+    if(executeDefault === false) {
+      e.preventDefault();
+    }
+  }
+};
+
+/**
+ * The keyTyped() function is called once every time a key is pressed, but
+ * action keys such as Ctrl, Shift, and Alt are ignored. The most recent
+ * key pressed will be stored in the key variable.
+ * <br><br>
+ * Because of how operating systems handle key repeats, holding down a key
+ * will cause multiple calls to keyTyped() (and keyReleased() as well). The
+ * rate of repeat is set by the operating system and how each computer is
+ * configured.<br><br>
+ * Browsers may have different default behaviors attached to various key
+ * events. To prevent any default behavior for this event, add "return false"
+ * to the end of the method.
+ *
+ * @method keyTyped
+ * @example
+ * <div>
+ * <code>
+ * var value = 0;
+ * function draw() {
+ *   fill(value);
+ *   rect(25, 25, 50, 50);
+ * }
+ * function keyTyped() {
+ *   if (key === 'a') {
+ *     value = 255;
+ *   } else if (key === 'b') {
+ *     value = 0;
+ *   }
+ *   return false; // prevent any default behavior
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype._onkeypress = function (e) {
+  if (e.which === this._lastKeyCodeTyped) { // prevent multiple firings
+    return;
+  }
+  this._setProperty('keyCode', e.which);
+  this._setProperty('_lastKeyCodeTyped', e.which); // track last keyCode
+  this._setProperty('key', String.fromCharCode(e.which));
+  var keyTyped = this.keyTyped || window.keyTyped;
+  if (typeof keyTyped === 'function') {
+    var executeDefault = keyTyped(e);
+    if(executeDefault === false) {
+      e.preventDefault();
+    }
+  }
+};
+/**
+ * The onblur function is called when the user is no longer focused
+ * on the p5 element. Because the keyup events will not fire if the user is
+ * not focused on the element we must assume all keys currently down have
+ * been released.
+ */
+p5.prototype._onblur = function (e) {
+  downKeys = {};
+};
+
+/**
+ * The keyIsDown() function checks if the key is currently down, i.e. pressed.
+ * It can be used if you have an object that moves, and you want several keys
+ * to be able to affect its behaviour simultaneously, such as moving a
+ * sprite diagonally. You can put in any number representing the keyCode of
+ * the key, or use any of the variable keyCode names listed
+ * <a href="http://p5js.org/reference/#p5/keyCode">here</a>.
+ *
+ * @method keyIsDown
+ * @param {Number}          code The key to check for.
+ * @return {Boolean}        whether key is down or not
+ * @example
+ * <div><code>
+ * var x = 100;
+ * var y = 100;
+ *
+ * function setup() {
+ *   createCanvas(512, 512);
+ * }
+ *
+ * function draw() {
+ *   if (keyIsDown(LEFT_ARROW))
+ *     x-=5;
+ *
+ *   if (keyIsDown(RIGHT_ARROW))
+ *     x+=5;
+ *
+ *   if (keyIsDown(UP_ARROW))
+ *     y-=5;
+ *
+ *   if (keyIsDown(DOWN_ARROW))
+ *     y+=5;
+ *
+ *   clear();
+ *   fill(255, 0, 0);
+ *   ellipse(x, y, 50, 50);
+ * }
+ * </code></div>
+ */
+p5.prototype.keyIsDown = function(code) {
+  return downKeys[code];
+};
+
+module.exports = p5;
+
+},{"../core/core":48}],63:[function(_dereq_,module,exports){
+/**
+ * @module Events
+ * @submodule Mouse
+ * @for p5
+ * @requires core
+ * @requires constants
+ */
+
+
+'use strict';
+
+var p5 = _dereq_('../core/core');
+var constants = _dereq_('../core/constants');
+
+/*
+ * These are helper vars that store the mouseX and mouseY vals
+ * between the time that a mouse event happens and the next frame
+ * of draw. This is done to deal with the asynchronicity of event
+ * calls interacting with the draw loop. When a mouse event occurs
+ * the _nextMouseX/Y vars are updated, then on each call of draw, mouseX/Y
+ * and pmouseX/Y are updated using the _nextMouseX/Y vals.
+ */
+p5.prototype._nextMouseX = 0;
+p5.prototype._nextMouseY = 0;
+
+/**
+ * The system variable mouseX always contains the current horizontal
+ * position of the mouse, relative to (0, 0) of the canvas.
+ *
+ * @property mouseX
+ *
+ * @example
+ * <div>
+ * <code>
+ * // Move the mouse across the canvas
+ * function draw() {
+ *   background(244, 248, 252);
+ *   line(mouseX, 0, mouseX, 100);
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype.mouseX = 0;
+
+/**
+ * The system variable mouseY always contains the current vertical position
+ * of the mouse, relative to (0, 0) of the canvas.
+ *
+ * @property mouseY
+ *
+ * @example
+ * <div>
+ * <code>
+ * // Move the mouse across the canvas
+ * function draw() {
+ *   background(244, 248, 252);
+ *   line(0, mouseY, 100, mouseY);
+ *}
+ * </code>
+ * </div>
+ */
+p5.prototype.mouseY = 0;
+
+/**
+ * The system variable pmouseX always contains the horizontal position of
+ * the mouse in the frame previous to the current frame, relative to (0, 0)
+ * of the canvas.
+ *
+ * @property pmouseX
+ *
+ * @example
+ * <div>
+ * <code>
+ * // Move the mouse across the canvas to leave a trail
+ * function setup() {
+ *   //slow down the frameRate to make it more visible
+ *   frameRate(10);
+ * }
+ *
+ * function draw() {
+ *   background(244, 248, 252);
+ *   line(mouseX, mouseY, pmouseX, pmouseY);
+ *   print(pmouseX + " -> " + mouseX);
+ * }
+ *
+ * </code>
+ * </div>
+ */
+p5.prototype.pmouseX = 0;
+
+/**
+ * The system variable pmouseY always contains the vertical position of the
+ * mouse in the frame previous to the current frame, relative to (0, 0) of
+ * the canvas.
+ *
+ * @property pmouseY
+ *
+ * @example
+ * <div>
+ * <code>
+ * function draw() {
+ *   background(237, 34, 93);
+ *   fill(0);
+ *   //draw a square only if the mouse is not moving
+ *   if(mouseY == pmouseY && mouseX == pmouseX)
+ *     rect(20,20,60,60);
+ *
+ *   print(pmouseY + " -> " + mouseY);
+ * }
+ *
+ * </code>
+ * </div>
+ */
+p5.prototype.pmouseY = 0;
+
+/**
+ * The system variable winMouseX always contains the current horizontal
+ * position of the mouse, relative to (0, 0) of the window.
+ *
+ * @property winMouseX
+ *
+ * @example
+ * <div>
+ * <code>
+ * var myCanvas;
+ *
+ * function setup() {
+ *   //use a variable to store a pointer to the canvas
+ *   myCanvas = createCanvas(100, 100);
+ * }
+ *
+ * function draw() {
+ *   background(237, 34, 93);
+ *   fill(0);
+ *
+ *   //move the canvas to the horizontal mouse position
+ *   //relative to the window
+ *   myCanvas.position(winMouseX+1, windowHeight/2);
+ *
+ *  //the y of the square is relative to the canvas
+ *  rect(20,mouseY,60,60);
+ * }
+ *
+ * </code>
+ * </div>
+ */
+p5.prototype.winMouseX = 0;
+
+/**
+ * The system variable winMouseY always contains the current vertical
+ * position of the mouse, relative to (0, 0) of the window.
+ *
+ * @property winMouseY
+ *
+ * @example
+ * <div>
+ * <code>
+ *var myCanvas;
+ *
+ * function setup() {
+ *   //use a variable to store a pointer to the canvas
+ *   myCanvas = createCanvas(100, 100);
+ * }
+ *
+ * function draw() {
+ *   background(237, 34, 93);
+ *   fill(0);
+ *
+ *   //move the canvas to the vertical mouse position
+ *   //relative to the window
+ *   myCanvas.position(windowWidth/2, winMouseY+1);
+ *
+ *  //the x of the square is relative to the canvas
+ *  rect(mouseX,20,60,60);
+ * }
+ *
+ * </code>
+ * </div>
+ */
+p5.prototype.winMouseY = 0;
+
+/**
+ * The system variable pwinMouseX always contains the horizontal position
+ * of the mouse in the frame previous to the current frame, relative to
+ * (0, 0) of the window.
+ *
+ * @property pwinMouseX
+ *
+ * @example
+ * <div>
+ * <code>
+ *
+ * var myCanvas;
+ *
+ * function setup() {
+ *   //use a variable to store a pointer to the canvas
+ *   myCanvas = createCanvas(100, 100);
+ *   noStroke();
+ *   fill(237, 34, 93);
+ *   }
+ *
+ * function draw() {
+ *   clear();
+ *   //the difference between previous and
+ *   //current x position is the horizontal mouse speed
+ *   var speed = abs(winMouseX-pwinMouseX);
+ *   //change the size of the circle
+ *   //according to the horizontal speed
+ *   ellipse(50, 50, 10+speed*5, 10+speed*5);
+ *   //move the canvas to the mouse position
+ *   myCanvas.position( winMouseX+1, winMouseY+1);
+ * }
+ *
+ * </code>
+ * </div>
+ */
+p5.prototype.pwinMouseX = 0;
+
+/**
+ * The system variable pwinMouseY always contains the vertical position of
+ * the mouse in the frame previous to the current frame, relative to (0, 0)
+ * of the window.
+ *
+ * @property pwinMouseY
+ *
+ *
+ * @example
+ * <div>
+ * <code>
+ *
+ * var myCanvas;
+ *
+ * function setup() {
+ *   //use a variable to store a pointer to the canvas
+ *   myCanvas = createCanvas(100, 100);
+ *   noStroke();
+ *   fill(237, 34, 93);
+ *   }
+ *
+ * function draw() {
+ *   clear();
+ *   //the difference between previous and
+ *   //current y position is the vertical mouse speed
+ *   var speed = abs(winMouseY-pwinMouseY);
+ *   //change the size of the circle
+ *   //according to the vertical speed
+ *   ellipse(50, 50, 10+speed*5, 10+speed*5);
+ *   //move the canvas to the mouse position
+ *   myCanvas.position( winMouseX+1, winMouseY+1);
+ * }
+ *
+ * </code>
+ * </div>
+ */
+p5.prototype.pwinMouseY = 0;
+
+/**
+ * Processing automatically tracks if the mouse button is pressed and which
+ * button is pressed. The value of the system variable mouseButton is either
+ * LEFT, RIGHT, or CENTER depending on which button was pressed last.
+ * Warning: different browsers may track mouseButton differently.
+ *
+ * @property mouseButton
+ *
+ * @example
+	* <div>
+	* <code>
+	* function draw() {
+	*   background(237, 34, 93);
+	*   fill(0);
+	*
+	*   if (mouseIsPressed) {
+	*     if (mouseButton == LEFT)
+	*       ellipse(50, 50, 50, 50);
+	*     if (mouseButton == RIGHT)
+	*       rect(25, 25, 50, 50);
+	*     if (mouseButton == CENTER)
+	*       triangle(23, 75, 50, 20, 78, 75);
+	*   }
+	*
+	*   print(mouseButton);
+	* }
+	* </code>
+ * </div>
+ */
+p5.prototype.mouseButton = 0;
+
+/**
+ * The boolean system variable mouseIsPressed is true if the mouse is pressed
+ * and false if not.
+ *
+ * @property mouseIsPressed
+ *
+ * @example
+	* <div>
+	* <code>
+	* function draw() {
+	*   background(237, 34, 93);
+	*   fill(0);
+	*
+	*   if (mouseIsPressed)
+	*     ellipse(50, 50, 50, 50);
+	*   else
+	*     rect(25, 25, 50, 50);
+	*
+	*   print(mouseIsPressed);
+	* }
+	* </code>
+	* </div>
+ */
+p5.prototype.mouseIsPressed = false;
+p5.prototype.isMousePressed = false; // both are supported
+
+p5.prototype._updateNextMouseCoords = function(e) {
+  if(e.type === 'touchstart' ||
+     e.type === 'touchmove' ||
+     e.type === 'touchend') {
+    this._setProperty('_nextMouseX', this._nextTouchX);
+    this._setProperty('_nextMouseY', this._nextTouchY);
+  } else {
+    if(this._curElement !== null) {
+      var mousePos = getMousePos(this._curElement.elt, e);
+      this._setProperty('_nextMouseX', mousePos.x);
+      this._setProperty('_nextMouseY', mousePos.y);
+    }
+  }
+  this._setProperty('winMouseX', e.pageX);
+  this._setProperty('winMouseY', e.pageY);
+};
+
+p5.prototype._updateMouseCoords = function() {
+  this._setProperty('pmouseX', this.mouseX);
+  this._setProperty('pmouseY', this.mouseY);
+  this._setProperty('mouseX', this._nextMouseX);
+  this._setProperty('mouseY', this._nextMouseY);
+  this._setProperty('pwinMouseX', this.winMouseX);
+  this._setProperty('pwinMouseY', this.winMouseY);
+};
+
+function getMousePos(canvas, evt) {
+  var rect = canvas.getBoundingClientRect();
+  return {
+    x: evt.clientX - rect.left,
+    y: evt.clientY - rect.top
+  };
+}
+
+p5.prototype._setMouseButton = function(e) {
+  if (e.button === 1) {
+    this._setProperty('mouseButton', constants.CENTER);
+  } else if (e.button === 2) {
+    this._setProperty('mouseButton', constants.RIGHT);
+  } else {
+    this._setProperty('mouseButton', constants.LEFT);
+  }
+};
+
+/**
+ * The mouseMoved() function is called every time the mouse moves and a mouse
+ * button is not pressed.<br><br>
+ * Browsers may have different default
+ * behaviors attached to various mouse events. To prevent any default
+ * behavior for this event, add "return false" to the end of the method.
+ *
+ * @method mouseMoved
+ * @example
+ * <div>
+ * <code>
+ * // Move the mouse across the page
+ * // to change its value
+ *
+ * var value = 0;
+ * function draw() {
+ *   fill(value);
+ *   rect(25, 25, 50, 50);
+ * }
+ * function mouseMoved() {
+ *   value = value + 5;
+ *   if (value > 255) {
+ *     value = 0;
+ *   }
+ * }
+ * </code>
+ * </div>
+ *
+ * <div class="norender">
+ * <code>
+ * function mouseMoved() {
+ *   ellipse(mouseX, mouseY, 5, 5);
+ *   // prevent default
+ *   return false;
+ * }
+ * </code>
+ * </div>
+ */
+
+/**
+ * The mouseDragged() function is called once every time the mouse moves and
+ * a mouse button is pressed. If no mouseDragged() function is defined, the
+ * touchMoved() function will be called instead if it is defined.<br><br>
+ * Browsers may have different default
+ * behaviors attached to various mouse events. To prevent any default
+ * behavior for this event, add "return false" to the end of the method.
+ *
+ * @method mouseDragged
+ * @example
+ * <div>
+ * <code>
+ * // Drag the mouse across the page
+ * // to change its value
+ *
+ * var value = 0;
+ * function draw() {
+ *   fill(value);
+ *   rect(25, 25, 50, 50);
+ * }
+ * function mouseDragged() {
+ *   value = value + 5;
+ *   if (value > 255) {
+ *     value = 0;
+ *   }
+ * }
+ * </code>
+ * </div>
+ *
+ * <div class="norender">
+ * <code>
+ * function mouseDragged() {
+ *   ellipse(mouseX, mouseY, 5, 5);
+ *   // prevent default
+ *   return false;
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype._onmousemove = function(e){
+  var context = this._isGlobal ? window : this;
+  var executeDefault;
+  this._updateNextMouseCoords(e);
+  this._updateNextTouchCoords(e);
+  if (!this.isMousePressed) {
+    if (typeof context.mouseMoved === 'function') {
+      executeDefault = context.mouseMoved(e);
+      if(executeDefault === false) {
+        e.preventDefault();
+      }
+    }
+  }
+  else {
+    if (typeof context.mouseDragged === 'function') {
+      executeDefault = context.mouseDragged(e);
+      if(executeDefault === false) {
+        e.preventDefault();
+      }
+    } else if (typeof context.touchMoved === 'function') {
+      executeDefault = context.touchMoved(e);
+      if(executeDefault === false) {
+        e.preventDefault();
+      }
+    }
+  }
+};
+
+/**
+ * The mousePressed() function is called once after every time a mouse button
+ * is pressed. The mouseButton variable (see the related reference entry)
+ * can be used to determine which button has been pressed. If no
+ * mousePressed() function is defined, the touchStarted() function will be
+ * called instead if it is defined.<br><br>
+ * Browsers may have different default
+ * behaviors attached to various mouse events. To prevent any default
+ * behavior for this event, add "return false" to the end of the method.
+ *
+ * @method mousePressed
+ * @example
+ * <div>
+ * <code>
+ * // Click within the image to change
+ * // the value of the rectangle
+ *
+ * var value = 0;
+ * function draw() {
+ *   fill(value);
+ *   rect(25, 25, 50, 50);
+ * }
+ * function mousePressed() {
+ *   if (value == 0) {
+ *     value = 255;
+ *   } else {
+ *     value = 0;
+ *   }
+ * }
+ * </code>
+ * </div>
+ *
+ * <div class="norender">
+ * <code>
+ * function mousePressed() {
+ *   ellipse(mouseX, mouseY, 5, 5);
+ *   // prevent default
+ *   return false;
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype._onmousedown = function(e) {
+  var context = this._isGlobal ? window : this;
+  var executeDefault;
+  this._setProperty('isMousePressed', true);
+  this._setProperty('mouseIsPressed', true);
+  this._setMouseButton(e);
+  this._updateNextMouseCoords(e);
+  this._updateNextTouchCoords(e);
+  if (typeof context.mousePressed === 'function') {
+    executeDefault = context.mousePressed(e);
+    if(executeDefault === false) {
+      e.preventDefault();
+    }
+  } else if (typeof context.touchStarted === 'function') {
+    executeDefault = context.touchStarted(e);
+    if(executeDefault === false) {
+      e.preventDefault();
+    }
+  }
+};
+
+/**
+ * The mouseReleased() function is called every time a mouse button is
+ * released. If no mouseReleased() function is defined, the touchEnded()
+ * function will be called instead if it is defined.<br><br>
+ * Browsers may have different default
+ * behaviors attached to various mouse events. To prevent any default
+ * behavior for this event, add "return false" to the end of the method.
+ *
+ *
+ * @method mouseReleased
+ * @example
+ * <div>
+ * <code>
+ * // Click within the image to change
+ * // the value of the rectangle
+ * // after the mouse has been clicked
+ *
+ * var value = 0;
+ * function draw() {
+ *   fill(value);
+ *   rect(25, 25, 50, 50);
+ * }
+ * function mouseReleased() {
+ *   if (value == 0) {
+ *     value = 255;
+ *   } else {
+ *     value = 0;
+ *   }
+ * }
+ * </code>
+ * </div>
+ *
+ * <div class="norender">
+ * <code>
+ * function mouseReleased() {
+ *   ellipse(mouseX, mouseY, 5, 5);
+ *   // prevent default
+ *   return false;
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype._onmouseup = function(e) {
+  var context = this._isGlobal ? window : this;
+  var executeDefault;
+  this._setProperty('isMousePressed', false);
+  this._setProperty('mouseIsPressed', false);
+  if (typeof context.mouseReleased === 'function') {
+    executeDefault = context.mouseReleased(e);
+    if(executeDefault === false) {
+      e.preventDefault();
+    }
+  } else if (typeof context.touchEnded === 'function') {
+    executeDefault = context.touchEnded(e);
+    if(executeDefault === false) {
+      e.preventDefault();
+    }
+  }
+};
+
+p5.prototype._ondragend = p5.prototype._onmouseup;
+p5.prototype._ondragover = p5.prototype._onmousemove;
+
+/**
+ * The mouseClicked() function is called once after a mouse button has been
+ * pressed and then released.<br><br>
+ * Browsers may have different default
+ * behaviors attached to various mouse events. To prevent any default
+ * behavior for this event, add "return false" to the end of the method.
+ *
+ * @method mouseClicked
+ * @example
+ * <div>
+ * <code>
+ * // Click within the image to change
+ * // the value of the rectangle
+ * // after the mouse has been clicked
+ *
+ * var value = 0;
+ * function draw() {
+ *   fill(value);
+ *   rect(25, 25, 50, 50);
+ * }
+ * function mouseClicked() {
+ *   if (value == 0) {
+ *     value = 255;
+ *   } else {
+ *     value = 0;
+ *   }
+ * }
+ * </code>
+ * </div>
+ *
+ * <div class="norender">
+ * <code>
+ * function mouseClicked() {
+ *   ellipse(mouseX, mouseY, 5, 5);
+ *   // prevent default
+ *   return false;
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype._onclick = function(e) {
+  var context = this._isGlobal ? window : this;
+  if (typeof context.mouseClicked === 'function') {
+    var executeDefault = context.mouseClicked(e);
+    if(executeDefault === false) {
+      e.preventDefault();
+    }
+  }
+};
+
+/**
+ * The function mouseWheel() is executed every time a vertical mouse wheel
+ * event is detected either triggered by an actual mouse wheel or by a
+ * touchpad.<br><br>
+ * The event.delta property returns the amount the mouse wheel
+ * have scrolled. The values can be positive or negative depending on the
+ * scroll direction (on OS X with "natural" scrolling enabled, the signs
+ * are inverted).<br><br>
+ * Browsers may have different default behaviors attached to various
+ * mouse events. To prevent any default behavior for this event, add
+ * "return false" to the end of the method.<br><br>
+ * Due to the current support of the "wheel" event on Safari, the function
+ * may only work as expected if "return false" is included while using Safari.
+ *
+ * @method mouseWheel
+ *
+ * @example
+ * <div>
+ * <code>
+ * var pos = 25;
+ *
+ * function draw() {
+ *   background(237, 34, 93);
+ *   fill(0);
+ *   rect(25, pos, 50, 50);
+ * }
+ *
+ * function mouseWheel(event) {
+ *   print(event.delta);
+ *   //move the square according to the vertical scroll amount
+ *   pos += event.delta;
+ *   //uncomment to block page scrolling
+ *   //return false;
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype._onwheel = function(e) {
+  var context = this._isGlobal ? window : this;
+  if (typeof context.mouseWheel === 'function') {
+    e.delta = e.deltaY;
+    var executeDefault = context.mouseWheel(e);
+    if(executeDefault === false) {
+      e.preventDefault();
+    }
+  }
+};
+
+module.exports = p5;
+
+},{"../core/constants":47,"../core/core":48}],64:[function(_dereq_,module,exports){
+/**
+ * @module Events
+ * @submodule Touch
+ * @for p5
+ * @requires core
+ */
+
+'use strict';
+
+var p5 = _dereq_('../core/core');
+
+/*
+ * These are helper vars that store the touchX and touchY vals
+ * between the time that a mouse event happens and the next frame
+ * of draw. This is done to deal with the asynchronicity of event
+ * calls interacting with the draw loop. When a touch event occurs
+ * the _nextTouchX/Y vars are updated, then on each call of draw, touchX/Y
+ * and ptouchX/Y are updated using the _nextMouseX/Y vals.
+ */
+p5.prototype._nextTouchX = 0;
+p5.prototype._nextTouchY = 0;
+
+/**
+ * The system variable touchX always contains the horizontal position of
+ * one finger, relative to (0, 0) of the canvas. This is best used for
+ * single touch interactions. For multi-touch interactions, use the
+ * touches[] array.
+ *
+ * @property touchX
+ */
+p5.prototype.touchX = 0;
+
+/**
+ * The system variable touchY always contains the vertical position of
+ * one finger, relative to (0, 0) of the canvas. This is best used for
+ * single touch interactions. For multi-touch interactions, use the
+ * touches[] array.
+ *
+ * @property touchY
+ */
+p5.prototype.touchY = 0;
+
+/**
+ * The system variable ptouchX always contains the horizontal position of
+ * one finger, relative to (0, 0) of the canvas, in the frame previous to the
+ * current frame.
+ *
+ * @property ptouchX
+ */
+p5.prototype.ptouchX = 0;
+
+/**
+ * The system variable ptouchY always contains the vertical position of
+ * one finger, relative to (0, 0) of the canvas, in the frame previous to the
+ * current frame.
+ *
+ * @property ptouchY
+ */
+p5.prototype.ptouchY = 0;
+
+/**
+ * The system variable touches[] contains an array of the positions of all
+ * current touch points, relative to (0, 0) of the canvas, and IDs identifying a
+ * unique touch as it moves. Each element in the array is an object with x, y,
+ * and id properties.
+ *
+ * @property touches[]
+ */
+p5.prototype.touches = [];
+
+/**
+ * The boolean system variable touchIsDown is true if the screen is
+ * touched and false if not.
+ *
+ * @property touchIsDown
+ */
+p5.prototype.touchIsDown = false;
+
+p5.prototype._updateNextTouchCoords = function(e) {
+  if(e.type === 'mousedown' ||
+     e.type === 'mousemove' ||
+     e.type === 'mouseup'){
+    this._setProperty('_nextTouchX', this._nextMouseX);
+    this._setProperty('_nextTouchY', this._nextMouseY);
+  } else {
+    if(this._curElement !== null) {
+      var touchInfo = getTouchInfo(this._curElement.elt, e, 0);
+      this._setProperty('_nextTouchX', touchInfo.x);
+      this._setProperty('_nextTouchY', touchInfo.y);
+
+      var touches = [];
+      for(var i = 0; i < e.touches.length; i++){
+        touches[i] = getTouchInfo(this._curElement.elt, e, i);
+      }
+      this._setProperty('touches', touches);
+    }
+  }
+};
+
+p5.prototype._updateTouchCoords = function() {
+  this._setProperty('ptouchX', this.touchX);
+  this._setProperty('ptouchY', this.touchY);
+  this._setProperty('touchX', this._nextTouchX);
+  this._setProperty('touchY', this._nextTouchY);
+};
+
+function getTouchInfo(canvas, e, i) {
+  i = i || 0;
+  var rect = canvas.getBoundingClientRect();
+  var touch = e.touches[i] || e.changedTouches[i];
+  return {
+    x: touch.clientX - rect.left,
+    y: touch.clientY - rect.top,
+    id: touch.identifier
+  };
+}
+
+/**
+ * The touchStarted() function is called once after every time a touch is
+ * registered. If no touchStarted() function is defined, the mousePressed()
+ * function will be called instead if it is defined.<br><br>
+ * Browsers may have different default behaviors attached to various touch
+ * events. To prevent any default behavior for this event, add "return false"
+ * to the end of the method.
+ *
+ * @method touchStarted
+ * @example
+ * <div>
+ * <code>
+ * // Touch within the image to change
+ * // the value of the rectangle
+ *
+ * var value = 0;
+ * function draw() {
+ *   fill(value);
+ *   rect(25, 25, 50, 50);
+ * }
+ * function touchStarted() {
+ *   if (value == 0) {
+ *     value = 255;
+ *   } else {
+ *     value = 0;
+ *   }
+ * }
+ * </code>
+ * </div>
+ *
+ * <div class="norender">
+ * <code>
+ * function touchStarted() {
+ *   ellipse(touchX, touchY, 5, 5);
+ *   // prevent default
+ *   return false;
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype._ontouchstart = function(e) {
+  var context = this._isGlobal ? window : this;
+  var executeDefault;
+  this._updateNextTouchCoords(e);
+  this._updateNextMouseCoords(e);
+  this._setProperty('touchIsDown', true);
+  if(typeof context.touchStarted === 'function') {
+    executeDefault = context.touchStarted(e);
+    if(executeDefault === false) {
+      e.preventDefault();
+    }
+  } else if (typeof context.mousePressed === 'function') {
+    executeDefault = context.mousePressed(e);
+    if(executeDefault === false) {
+      e.preventDefault();
+    }
+    //this._setMouseButton(e);
+  }
+};
+
+/**
+ * The touchMoved() function is called every time a touch move is registered.
+ * If no touchMoved() function is defined, the mouseDragged() function will
+ * be called instead if it is defined.<br><br>
+ * Browsers may have different default behaviors attached to various touch
+ * events. To prevent any default behavior for this event, add "return false"
+ * to the end of the method.
+ *
+ * @method touchMoved
+ * @example
+ * <div>
+ * <code>
+ * // Move your finger across the page
+ * // to change its value
+ *
+ * var value = 0;
+ * function draw() {
+ *   fill(value);
+ *   rect(25, 25, 50, 50);
+ * }
+ * function touchMoved() {
+ *   value = value + 5;
+ *   if (value > 255) {
+ *     value = 0;
+ *   }
+ * }
+ * </code>
+ * </div>
+ *
+ * <div class="norender">
+ * <code>
+ * function touchMoved() {
+ *   ellipse(touchX, touchY, 5, 5);
+ *   // prevent default
+ *   return false;
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype._ontouchmove = function(e) {
+  var context = this._isGlobal ? window : this;
+  var executeDefault;
+  this._updateNextTouchCoords(e);
+  this._updateNextMouseCoords(e);
+  if (typeof context.touchMoved === 'function') {
+    executeDefault = context.touchMoved(e);
+    if(executeDefault === false) {
+      e.preventDefault();
+    }
+  } else if (typeof context.mouseDragged === 'function') {
+    executeDefault = context.mouseDragged(e);
+    if(executeDefault === false) {
+      e.preventDefault();
+    }
+  }
+};
+
+/**
+ * The touchEnded() function is called every time a touch ends. If no
+ * touchEnded() function is defined, the mouseReleased() function will be
+ * called instead if it is defined.<br><br>
+ * Browsers may have different default behaviors attached to various touch
+ * events. To prevent any default behavior for this event, add "return false"
+ * to the end of the method.
+ *
+ * @method touchEnded
+ * @example
+ * <div>
+ * <code>
+ * // Release touch within the image to
+ * // change the value of the rectangle
+ *
+ * var value = 0;
+ * function draw() {
+ *   fill(value);
+ *   rect(25, 25, 50, 50);
+ * }
+ * function touchEnded() {
+ *   if (value == 0) {
+ *     value = 255;
+ *   } else {
+ *     value = 0;
+ *   }
+ * }
+ * </code>
+ * </div>
+ *
+ * <div class="norender">
+ * <code>
+ * function touchEnded() {
+ *   ellipse(touchX, touchY, 5, 5);
+ *   // prevent default
+ *   return false;
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype._ontouchend = function(e) {
+  this._updateNextTouchCoords(e);
+  this._updateNextMouseCoords(e);
+  if (this.touches.length === 0) {
+    this._setProperty('touchIsDown', false);
+  }
+  var context = this._isGlobal ? window : this;
+  var executeDefault;
+  if (typeof context.touchEnded === 'function') {
+    executeDefault = context.touchEnded(e);
+    if(executeDefault === false) {
+      e.preventDefault();
+    }
+  } else if (typeof context.mouseReleased === 'function') {
+    executeDefault = context.mouseReleased(e);
+    if(executeDefault === false) {
+      e.preventDefault();
+    }
+  }
+};
+
+module.exports = p5;
+
+},{"../core/core":48}],65:[function(_dereq_,module,exports){
+/*global ImageData:false */
+
+/**
+ * This module defines the filters for use with image buffers.
+ *
+ * This module is basically a collection of functions stored in an object
+ * as opposed to modules. The functions are destructive, modifying
+ * the passed in canvas rather than creating a copy.
+ *
+ * Generally speaking users of this module will use the Filters.apply method
+ * on a canvas to create an effect.
+ *
+ * A number of functions are borrowed/adapted from
+ * http://www.html5rocks.com/en/tutorials/canvas/imagefilters/
+ * or the java processing implementation.
+ */
+
+'use strict';
+
+var Filters = {};
+
+
+/*
+ * Helper functions
+ */
+
+
+/**
+ * Returns the pixel buffer for a canvas
+ *
+ * @private
+ *
+ * @param  {Canvas|ImageData} canvas the canvas to get pixels from
+ * @return {Uint8ClampedArray}       a one-dimensional array containing
+ *                                   the data in thc RGBA order, with integer
+ *                                   values between 0 and 255
+ */
+Filters._toPixels = function (canvas) {
+  if (canvas instanceof ImageData) {
+    return canvas.data;
+  } else {
+    return canvas.getContext('2d').getImageData(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    ).data;
+  }
+};
+
+/**
+ * Returns a 32 bit number containing ARGB data at ith pixel in the
+ * 1D array containing pixels data.
+ *
+ * @private
+ *
+ * @param  {Uint8ClampedArray} data array returned by _toPixels()
+ * @param  {Integer}           i    index of a 1D Image Array
+ * @return {Integer}                32 bit integer value representing
+ *                                  ARGB value.
+ */
+Filters._getARGB = function (data, i) {
+  var offset = i * 4;
+  return (data[offset+3] << 24) & 0xff000000 |
+    (data[offset] << 16) & 0x00ff0000 |
+    (data[offset+1] << 8) & 0x0000ff00 |
+    data[offset+2] & 0x000000ff;
+};
+
+/**
+ * Modifies pixels RGBA values to values contained in the data object.
+ *
+ * @private
+ *
+ * @param {Uint8ClampedArray} pixels array returned by _toPixels()
+ * @param {Int32Array}        data   source 1D array where each value
+ *                                   represents ARGB values
+ */
+Filters._setPixels = function (pixels, data) {
+  var offset = 0;
+  for( var i = 0, al = pixels.length; i < al; i++) {
+    offset = i*4;
+    pixels[offset + 0] = (data[i] & 0x00ff0000)>>>16;
+    pixels[offset + 1] = (data[i] & 0x0000ff00)>>>8;
+    pixels[offset + 2] = (data[i] & 0x000000ff);
+    pixels[offset + 3] = (data[i] & 0xff000000)>>>24;
+  }
+};
+
+/**
+ * Returns the ImageData object for a canvas
+ * https://developer.mozilla.org/en-US/docs/Web/API/ImageData
+ *
+ * @private
+ *
+ * @param  {Canvas|ImageData} canvas canvas to get image data from
+ * @return {ImageData}               Holder of pixel data (and width and
+ *                                   height) for a canvas
+ */
+Filters._toImageData = function (canvas) {
+  if (canvas instanceof ImageData) {
+    return canvas;
+  } else {
+    return canvas.getContext('2d').getImageData(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+  }
+};
+
+/**
+ * Returns a blank ImageData object.
+ *
+ * @private
+ *
+ * @param  {Integer} width
+ * @param  {Integer} height
+ * @return {ImageData}
+ */
+Filters._createImageData = function (width, height) {
+  Filters._tmpCanvas = document.createElement('canvas');
+  Filters._tmpCtx = Filters._tmpCanvas.getContext('2d');
+  return this._tmpCtx.createImageData(width, height);
+};
+
+
+/**
+ * Applys a filter function to a canvas.
+ *
+ * The difference between this and the actual filter functions defined below
+ * is that the filter functions generally modify the pixel buffer but do
+ * not actually put that data back to the canvas (where it would actually
+ * update what is visible). By contrast this method does make the changes
+ * actually visible in the canvas.
+ *
+ * The apply method is the method that callers of this module would generally
+ * use. It has been separated from the actual filters to support an advanced
+ * use case of creating a filter chain that executes without actually updating
+ * the canvas in between everystep.
+ *
+ * @param  {[type]} func   [description]
+ * @param  {[type]} canvas [description]
+ * @param  {[type]} level  [description]
+ * @return {[type]}        [description]
+ */
+Filters.apply = function (canvas, func, filterParam) {
+  var ctx = canvas.getContext('2d');
+  var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+  //Filters can either return a new ImageData object, or just modify
+  //the one they received.
+  var newImageData = func(imageData, filterParam);
+  if (newImageData instanceof ImageData) {
+    ctx.putImageData(newImageData, 0, 0, 0, 0, canvas.width, canvas.height);
+  } else {
+    ctx.putImageData(imageData, 0, 0, 0, 0, canvas.width, canvas.height);
+  }
+};
+
+
+/*
+ * Filters
+ */
+
+
+/**
+ * Converts the image to black and white pixels depending if they are above or
+ * below the threshold defined by the level parameter. The parameter must be
+ * between 0.0 (black) and 1.0 (white). If no level is specified, 0.5 is used.
+ *
+ * Borrowed from http://www.html5rocks.com/en/tutorials/canvas/imagefilters/
+ *
+ * @param  {Canvas} canvas
+ * @param  {Float} level
+ */
+Filters.threshold = function (canvas, level) {
+  var pixels = Filters._toPixels(canvas);
+
+  if (level === undefined) {
+    level = 0.5;
+  }
+  var thresh = Math.floor(level * 255);
+
+  for (var i = 0; i < pixels.length; i += 4) {
+    var r = pixels[i];
+    var g = pixels[i + 1];
+    var b = pixels[i + 2];
+    var gray = (0.2126 * r + 0.7152 * g + 0.0722 * b);
+    var val;
+    if (gray >= thresh) {
+      val = 255;
+    } else {
+      val = 0;
+    }
+    pixels[i] = pixels[i + 1] = pixels[i + 2] = val;
+  }
+
+};
+
+
+/**
+ * Converts any colors in the image to grayscale equivalents.
+ * No parameter is used.
+ *
+ * Borrowed from http://www.html5rocks.com/en/tutorials/canvas/imagefilters/
+ *
+ * @param {Canvas} canvas
+ */
+Filters.gray = function (canvas) {
+  var pixels = Filters._toPixels(canvas);
+
+  for (var i = 0; i < pixels.length; i += 4) {
+    var r = pixels[i];
+    var g = pixels[i + 1];
+    var b = pixels[i + 2];
+
+    // CIE luminance for RGB
+    var gray = (0.2126 * r + 0.7152 * g + 0.0722 * b);
+    pixels[i] = pixels[i + 1] = pixels[i + 2] = gray;
+  }
+};
+
+/**
+ * Sets the alpha channel to entirely opaque. No parameter is used.
+ *
+ * @param {Canvas} canvas
+ */
+Filters.opaque = function (canvas) {
+  var pixels = Filters._toPixels(canvas);
+
+  for (var i = 0; i < pixels.length; i += 4) {
+    pixels[i + 3] = 255;
+  }
+
+  return pixels;
+};
+
+/**
+ * Sets each pixel to its inverse value. No parameter is used.
+ * @param {Invert}
+ */
+Filters.invert = function (canvas) {
+  var pixels = Filters._toPixels(canvas);
+
+  for (var i = 0; i < pixels.length; i += 4) {
+    pixels[i] = 255 - pixels[i];
+    pixels[i + 1] = 255 - pixels[i + 1];
+    pixels[i + 2] = 255 - pixels[i + 2];
+  }
+
+};
+
+
+/**
+ * Limits each channel of the image to the number of colors specified as
+ * the parameter. The parameter can be set to values between 2 and 255, but
+ * results are most noticeable in the lower ranges.
+ *
+ * Adapted from java based processing implementation
+ *
+ * @param  {Canvas} canvas
+ * @param  {Integer} level
+ */
+Filters.posterize = function (canvas, level) {
+  var pixels = Filters._toPixels(canvas);
+
+  if ((level < 2) || (level > 255)) {
+    throw new Error(
+      'Level must be greater than 2 and less than 255 for posterize'
+    );
+  }
+
+  var levels1 = level - 1;
+  for (var i = 0; i < pixels.length; i+=4) {
+    var rlevel = pixels[i];
+    var glevel = pixels[i + 1];
+    var blevel = pixels[i + 2];
+
+    pixels[i] = (((rlevel * level) >> 8) * 255) / levels1;
+    pixels[i + 1] = (((glevel * level) >> 8) * 255) / levels1;
+    pixels[i + 2] = (((blevel * level) >> 8) * 255) / levels1;
+  }
+};
+
+/**
+ * reduces the bright areas in an image
+ * @param  {Canvas} canvas
+ *
+ */
+Filters.dilate = function (canvas) {
+  var pixels = Filters._toPixels(canvas);
+  var currIdx = 0;
+  var maxIdx = pixels.length ? pixels.length/4 : 0;
+  var out = new Int32Array(maxIdx);
+  var currRowIdx, maxRowIdx, colOrig, colOut, currLum;
+  var idxRight, idxLeft, idxUp, idxDown,
+      colRight, colLeft, colUp, colDown,
+      lumRight, lumLeft, lumUp, lumDown;
+
+  while(currIdx < maxIdx) {
+    currRowIdx = currIdx;
+    maxRowIdx = currIdx + canvas.width;
+    while (currIdx < maxRowIdx) {
+      colOrig = colOut = Filters._getARGB(pixels, currIdx);
+      idxLeft = currIdx - 1;
+      idxRight = currIdx + 1;
+      idxUp = currIdx - canvas.width;
+      idxDown = currIdx + canvas.width;
+
+      if (idxLeft < currRowIdx) {
+        idxLeft = currIdx;
+      }
+      if (idxRight >= maxRowIdx) {
+        idxRight = currIdx;
+      }
+      if (idxUp < 0){
+        idxUp = 0;
+      }
+      if (idxDown >= maxIdx) {
+        idxDown = currIdx;
+      }
+      colUp = Filters._getARGB(pixels, idxUp);
+      colLeft = Filters._getARGB(pixels, idxLeft);
+      colDown = Filters._getARGB(pixels, idxDown);
+      colRight = Filters._getARGB(pixels, idxRight);
+
+      //compute luminance
+      currLum = 77*(colOrig>>16&0xff) +
+        151*(colOrig>>8&0xff) +
+        28*(colOrig&0xff);
+      lumLeft = 77*(colLeft>>16&0xff) +
+        151*(colLeft>>8&0xff) +
+        28*(colLeft&0xff);
+      lumRight = 77*(colRight>>16&0xff) +
+        151*(colRight>>8&0xff) +
+        28*(colRight&0xff);
+      lumUp = 77*(colUp>>16&0xff) +
+        151*(colUp>>8&0xff) +
+        28*(colUp&0xff);
+      lumDown = 77*(colDown>>16&0xff) +
+        151*(colDown>>8&0xff) +
+        28*(colDown&0xff);
+
+      if (lumLeft > currLum) {
+        colOut = colLeft;
+        currLum = lumLeft;
+      }
+      if (lumRight > currLum) {
+        colOut = colRight;
+        currLum = lumRight;
+      }
+      if (lumUp > currLum) {
+        colOut = colUp;
+        currLum = lumUp;
+      }
+      if (lumDown > currLum) {
+        colOut = colDown;
+        currLum = lumDown;
+      }
+      out[currIdx++]=colOut;
+    }
+  }
+  Filters._setPixels(pixels, out);
+};
+
+/**
+ * increases the bright areas in an image
+ * @param  {Canvas} canvas
+ *
+ */
+Filters.erode = function(canvas) {
+  var pixels = Filters._toPixels(canvas);
+  var currIdx = 0;
+  var maxIdx = pixels.length ? pixels.length/4 : 0;
+  var out = new Int32Array(maxIdx);
+  var currRowIdx, maxRowIdx, colOrig, colOut, currLum;
+  var idxRight, idxLeft, idxUp, idxDown,
+      colRight, colLeft, colUp, colDown,
+      lumRight, lumLeft, lumUp, lumDown;
+
+  while(currIdx < maxIdx) {
+    currRowIdx = currIdx;
+    maxRowIdx = currIdx + canvas.width;
+    while (currIdx < maxRowIdx) {
+      colOrig = colOut = Filters._getARGB(pixels, currIdx);
+      idxLeft = currIdx - 1;
+      idxRight = currIdx + 1;
+      idxUp = currIdx - canvas.width;
+      idxDown = currIdx + canvas.width;
+
+      if (idxLeft < currRowIdx) {
+        idxLeft = currIdx;
+      }
+      if (idxRight >= maxRowIdx) {
+        idxRight = currIdx;
+      }
+      if (idxUp < 0) {
+        idxUp = 0;
+      }
+      if (idxDown >= maxIdx) {
+        idxDown = currIdx;
+      }
+      colUp = Filters._getARGB(pixels, idxUp);
+      colLeft = Filters._getARGB(pixels, idxLeft);
+      colDown = Filters._getARGB(pixels, idxDown);
+      colRight = Filters._getARGB(pixels, idxRight);
+
+      //compute luminance
+      currLum = 77*(colOrig>>16&0xff) +
+        151*(colOrig>>8&0xff) +
+        28*(colOrig&0xff);
+      lumLeft = 77*(colLeft>>16&0xff) +
+        151*(colLeft>>8&0xff) +
+        28*(colLeft&0xff);
+      lumRight = 77*(colRight>>16&0xff) +
+        151*(colRight>>8&0xff) +
+        28*(colRight&0xff);
+      lumUp = 77*(colUp>>16&0xff) +
+        151*(colUp>>8&0xff) +
+        28*(colUp&0xff);
+      lumDown = 77*(colDown>>16&0xff) +
+        151*(colDown>>8&0xff) +
+        28*(colDown&0xff);
+
+      if (lumLeft < currLum) {
+        colOut = colLeft;
+        currLum = lumLeft;
+      }
+      if (lumRight < currLum) {
+        colOut = colRight;
+        currLum = lumRight;
+      }
+      if (lumUp < currLum) {
+        colOut = colUp;
+        currLum = lumUp;
+      }
+      if (lumDown < currLum) {
+        colOut = colDown;
+        currLum = lumDown;
+      }
+
+      out[currIdx++]=colOut;
+    }
+  }
+  Filters._setPixels(pixels, out);
+};
+
+// BLUR
+
+// internal kernel stuff for the gaussian blur filter
+var blurRadius;
+var blurKernelSize;
+var blurKernel;
+var blurMult;
+
+/*
+ * Port of https://github.com/processing/processing/blob/
+ * master/core/src/processing/core/PImage.java#L1250
+ *
+ * Optimized code for building the blur kernel.
+ * further optimized blur code (approx. 15% for radius=20)
+ * bigger speed gains for larger radii (~30%)
+ * added support for various image types (ALPHA, RGB, ARGB)
+ * [toxi 050728]
+ */
+function buildBlurKernel(r) {
+  var radius = (r * 3.5)|0;
+  radius = (radius < 1) ? 1 : ((radius < 248) ? radius : 248);
+
+  if (blurRadius !== radius) {
+    blurRadius = radius;
+    blurKernelSize = 1 + blurRadius<<1;
+    blurKernel = new Int32Array(blurKernelSize);
+    blurMult = new Array(blurKernelSize);
+    for(var l = 0; l < blurKernelSize; l++){
+      blurMult[l] = new Int32Array(256);
+    }
+
+    var bk,bki;
+    var bm,bmi;
+
+    for (var i = 1, radiusi = radius - 1; i < radius; i++) {
+      blurKernel[radius+i] = blurKernel[radiusi] = bki = radiusi * radiusi;
+      bm = blurMult[radius+i];
+      bmi = blurMult[radiusi--];
+      for (var j = 0; j < 256; j++){
+        bm[j] = bmi[j] = bki * j;
+      }
+    }
+    bk = blurKernel[radius] = radius * radius;
+    bm = blurMult[radius];
+
+    for (var k = 0; k < 256; k++){
+      bm[k] = bk * k;
+    }
+  }
+
+}
+
+// Port of https://github.com/processing/processing/blob/
+// master/core/src/processing/core/PImage.java#L1433
+function blurARGB(canvas, radius) {
+  var pixels = Filters._toPixels(canvas);
+  var width = canvas.width;
+  var height = canvas.height;
+  var numPackedPixels = width * height;
+  var argb = new Int32Array(numPackedPixels);
+  for (var j = 0; j < numPackedPixels; j++) {
+    argb[j] = Filters._getARGB(pixels, j);
+  }
+  var sum, cr, cg, cb, ca;
+  var read, ri, ym, ymi, bk0;
+  var a2 = new Int32Array(numPackedPixels);
+  var r2 = new Int32Array(numPackedPixels);
+  var g2 = new Int32Array(numPackedPixels);
+  var b2 = new Int32Array(numPackedPixels);
+  var yi = 0;
+  buildBlurKernel(radius);
+  var x, y, i;
+  var bm;
+  for (y = 0; y < height; y++) {
+    for (x = 0; x < width; x++) {
+      cb = cg = cr = ca = sum = 0;
+      read = x - blurRadius;
+      if (read < 0) {
+        bk0 = -read;
+        read = 0;
+      } else {
+        if (read >= width) {
+          break;
+        }
+        bk0 = 0;
+      }
+      for (i = bk0; i < blurKernelSize; i++) {
+        if (read >= width) {
+          break;
+        }
+        var c = argb[read + yi];
+        bm = blurMult[i];
+        ca += bm[(c & -16777216) >>> 24];
+        cr += bm[(c & 16711680) >> 16];
+        cg += bm[(c & 65280) >> 8];
+        cb += bm[c & 255];
+        sum += blurKernel[i];
+        read++;
+      }
+      ri = yi + x;
+      a2[ri] = ca / sum;
+      r2[ri] = cr / sum;
+      g2[ri] = cg / sum;
+      b2[ri] = cb / sum;
+    }
+    yi += width;
+  }
+  yi = 0;
+  ym = -blurRadius;
+  ymi = ym * width;
+  for (y = 0; y < height; y++) {
+    for (x = 0; x < width; x++) {
+      cb = cg = cr = ca = sum = 0;
+      if (ym < 0) {
+        bk0 = ri = -ym;
+        read = x;
+      } else {
+        if (ym >= height) {
+          break;
+        }
+        bk0 = 0;
+        ri = ym;
+        read = x + ymi;
+      }
+      for (i = bk0; i < blurKernelSize; i++) {
+        if (ri >= height) {
+          break;
+        }
+        bm = blurMult[i];
+        ca += bm[a2[read]];
+        cr += bm[r2[read]];
+        cg += bm[g2[read]];
+        cb += bm[b2[read]];
+        sum += blurKernel[i];
+        ri++;
+        read += width;
+      }
+      argb[x + yi] = (ca/sum)<<24 | (cr/sum)<<16 | (cg/sum)<<8 | (cb/sum);
+    }
+    yi += width;
+    ymi += width;
+    ym++;
+  }
+  Filters._setPixels(pixels, argb);
+}
+
+Filters.blur = function(canvas, radius){
+  blurARGB(canvas, radius);
+};
+
+
+module.exports = Filters;
+
+},{}],66:[function(_dereq_,module,exports){
+/**
+ * @module Image
+ * @submodule Image
+ * @for p5
+ * @requires core
+ */
+
+/**
+ * This module defines the p5 methods for the p5.Image class
+ * for drawing images to the main display canvas.
+ */
+'use strict';
+
+
+var p5 = _dereq_('../core/core');
+
+/* global frames:true */// This is not global, but JSHint is not aware that
+// this module is implicitly enclosed with Browserify: this overrides the
+// redefined-global error and permits using the name "frames" for the array
+// of saved animation frames.
+var frames = [];
+
+
+/**
+ * Creates a new p5.Image (the datatype for storing images). This provides a
+ * fresh buffer of pixels to play with. Set the size of the buffer with the
+ * width and height parameters.
+ * <br><br>
+ * .pixels gives access to an array containing the values for all the pixels
+ * in the display window.
+ * These values are numbers. This array is the size (including an appropriate
+ * factor for the pixelDensity) of the display window x4,
+ * representing the R, G, B, A values in order for each pixel, moving from
+ * left to right across each row, then down each column. See .pixels for
+ * more info. It may also be simpler to use set() or get().
+ * <br><br>
+ * Before accessing the pixels of an image, the data must loaded with the
+ * loadPixels() function. After the array data has been modified, the
+ * updatePixels() function must be run to update the changes.
+ *
+ * @method createImage
+ * @param  {Integer} width  width in pixels
+ * @param  {Integer} height height in pixels
+ * @return {p5.Image}       the p5.Image object
+ * @example
+ * <div>
+ * <code>
+ * img = createImage(66, 66);
+ * img.loadPixels();
+ * for (i = 0; i < img.width; i++) {
+ *   for (j = 0; j < img.height; j++) {
+ *     img.set(i, j, color(0, 90, 102));
+ *   }
+ * }
+ * img.updatePixels();
+ * image(img, 17, 17);
+ * </code>
+ * </div>
+ *
+ * <div>
+ * <code>
+ * img = createImage(66, 66);
+ * img.loadPixels();
+ * for (i = 0; i < img.width; i++) {
+ *   for (j = 0; j < img.height; j++) {
+ *     img.set(i, j, color(0, 90, 102, i % img.width * 2));
+ *   }
+ * }
+ * img.updatePixels();
+ * image(img, 17, 17);
+ * image(img, 34, 34);
+ * </code>
+ * </div>
+ *
+ * <div>
+ * <code>
+ * var pink = color(255, 102, 204);
+ * img = createImage(66, 66);
+ * img.loadPixels();
+ * var d = pixelDensity;
+ * var halfImage = 4 * (width * d) * (height/2 * d);
+ * for (var i = 0; i < halfImage; i+=4) {
+ *   img.pixels[i] = red(pink);
+ *   img.pixels[i+1] = green(pink);
+ *   img.pixels[i+2] = blue(pink);
+ *   img.pixels[i+3] = alpha(pink);
+ * }
+ * img.updatePixels();
+ * image(img, 17, 17);
+ * </code>
+ * </div>
+ */
+p5.prototype.createImage = function(width, height) {
+  return new p5.Image(width, height);
+};
+
+/**
+ *  Save the current canvas as an image. In Safari, this will open the
+ *  image in the window and the user must provide their own
+ *  filename on save-as. Other browsers will either save the
+ *  file immediately, or prompt the user with a dialogue window.
+ *
+ *  @method saveCanvas
+ *  @param  {[selectedCanvas]} canvas a variable representing a
+ *                             specific html5 canvas (optional)
+ *  @param  {[String]} filename
+ *  @param  {[String]} extension 'jpg' or 'png'
+ *  @example
+ *  <div class='norender'><code>
+ *  function setup() {
+ *    var c = createCanvas(100, 100);
+ *    background(255, 0, 0);
+ *    saveCanvas(c, 'myCanvas', 'jpg');
+ *  }
+ *  </code></div>
+ *  <div class='norender'><code>
+ *  // note that this example has the same result as above
+ *  // if no canvas is specified, defaults to main canvas
+ *  function setup() {
+ *    createCanvas(100, 100);
+ *    background(255, 0, 0);
+ *    saveCanvas('myCanvas', 'jpg');
+ *  }
+ *  </code></div>
+ *  <div class='norender'><code>
+ *  // all of the following are valid
+ *  saveCanvas(c, 'myCanvas', 'jpg');
+ *  saveCanvas(c, 'myCanvas');
+ *  saveCanvas(c);
+ *  saveCanvas('myCanvas', 'png');
+ *  saveCanvas('myCanvas');
+ *  saveCanvas();
+ *  </code></div>
+ */
+p5.prototype.saveCanvas = function() {
+
+  var cnv, filename, extension;
+  if (arguments.length === 3) {
+    cnv = arguments[0];
+    filename = arguments[1];
+    extension = arguments[2];
+  } else if (arguments.length === 2) {
+    if (typeof arguments[0] === 'object') {
+      cnv = arguments[0];
+      filename = arguments[1];
+    } else {
+      filename = arguments[0];
+      extension = arguments[1];
+    }
+  } else if (arguments.length === 1) {
+    if (typeof arguments[0] === 'object') {
+      cnv = arguments[0];
+    } else {
+      filename = arguments[0];
+    }
+  }
+
+  if (cnv instanceof p5.Element) {
+    cnv = cnv.elt;
+  }
+  if (!(cnv instanceof HTMLCanvasElement)) {
+    cnv = null;
+  }
+
+  if (!extension) {
+    extension = p5.prototype._checkFileExtension(filename, extension)[1];
+    if (extension === '') {
+      extension = 'png';
+    }
+  }
+
+  if (!cnv) {
+    if (this._curElement && this._curElement.elt) {
+      cnv = this._curElement.elt;
+    }
+  }
+
+  if ( p5.prototype._isSafari() ) {
+    var aText = 'Hello, Safari user!\n';
+    aText += 'Now capturing a screenshot...\n';
+    aText += 'To save this image,\n';
+    aText += 'go to File --> Save As.\n';
+    alert(aText);
+    window.location.href = cnv.toDataURL();
+  } else {
+    var mimeType;
+    if (typeof(extension) === 'undefined') {
+      extension = 'png';
+      mimeType = 'image/png';
+    }
+    else {
+      switch(extension){
+      case 'png':
+        mimeType = 'image/png';
+        break;
+      case 'jpeg':
+        mimeType = 'image/jpeg';
+        break;
+      case 'jpg':
+        mimeType = 'image/jpeg';
+        break;
+      default:
+        mimeType = 'image/png';
+        break;
+      }
+    }
+    var downloadMime = 'image/octet-stream';
+    var imageData = cnv.toDataURL(mimeType);
+    imageData = imageData.replace(mimeType, downloadMime);
+
+    p5.prototype.downloadFile(imageData, filename, extension);
+  }
+};
+
+/**
+ *  Capture a sequence of frames that can be used to create a movie.
+ *  Accepts a callback. For example, you may wish to send the frames
+ *  to a server where they can be stored or converted into a movie.
+ *  If no callback is provided, the browser will attempt to download
+ *  all of the images that have just been created.
+ *
+ *  @method saveFrames
+ *  @param  {String}   filename
+ *  @param  {String}   extension 'jpg' or 'png'
+ *  @param  {Number}   duration  Duration in seconds to save the frames for.
+ *  @param  {Number}   framerate  Framerate to save the frames in.
+ *  @param  {Function} [callback] A callback function that will be executed
+                                  to handle the image data. This function
+                                  should accept an array as argument. The
+                                  array will contain the spcecified number of
+                                  frames of objects. Each object have three
+                                  properties: imageData - an
+                                  image/octet-stream, filename and extension.
+ */
+p5.prototype.saveFrames = function(fName, ext, _duration, _fps, callback) {
+  var duration = _duration || 3;
+  duration = p5.prototype.constrain(duration, 0, 15);
+  duration = duration * 1000;
+  var fps = _fps || 15;
+  fps = p5.prototype.constrain(fps, 0, 22);
+  var count = 0;
+
+  var makeFrame = p5.prototype._makeFrame;
+  var cnv = this._curElement.elt;
+  var frameFactory = setInterval(function(){
+    makeFrame(fName + count, ext, cnv);
+    count++;
+  },1000/fps);
+
+  setTimeout(function(){
+    clearInterval(frameFactory);
+    if (callback) {
+      callback(frames);
+    }
+    else {
+      for (var i = 0; i < frames.length; i++) {
+        var f = frames[i];
+        p5.prototype.downloadFile(f.imageData, f.filename, f.ext);
+      }
+    }
+    frames = []; // clear frames
+  }, duration + 0.01);
+};
+
+p5.prototype._makeFrame = function(filename, extension, _cnv) {
+  var cnv;
+  if (this) {
+    cnv = this._curElement.elt;
+  } else {
+    cnv = _cnv;
+  }
+  var mimeType;
+  if (!extension) {
+    extension = 'png';
+    mimeType = 'image/png';
+  }
+  else {
+    switch(extension.toLowerCase()){
+    case 'png':
+      mimeType = 'image/png';
+      break;
+    case 'jpeg':
+      mimeType = 'image/jpeg';
+      break;
+    case 'jpg':
+      mimeType = 'image/jpeg';
+      break;
+    default:
+      mimeType = 'image/png';
+      break;
+    }
+  }
+  var downloadMime = 'image/octet-stream';
+  var imageData = cnv.toDataURL(mimeType);
+  imageData = imageData.replace(mimeType, downloadMime);
+
+  var thisFrame = {};
+  thisFrame.imageData = imageData;
+  thisFrame.filename = filename;
+  thisFrame.ext = extension;
+  frames.push(thisFrame);
+};
+
+module.exports = p5;
+
+},{"../core/core":48}],67:[function(_dereq_,module,exports){
+/**
+ * @module Image
+ * @submodule Loading & Displaying
+ * @for p5
+ * @requires core
+ */
+
+'use strict';
+
+var p5 = _dereq_('../core/core');
+var Filters = _dereq_('./filters');
+var canvas = _dereq_('../core/canvas');
+var constants = _dereq_('../core/constants');
+
+_dereq_('../core/error_helpers');
+
+/**
+ * Loads an image from a path and creates a p5.Image from it.
+ * <br><br>
+ * The image may not be immediately available for rendering
+ * If you want to ensure that the image is ready before doing
+ * anything with it, place the loadImage() call in preload().
+ * You may also supply a callback function to handle the image when it's ready.
+ * <br><br>
+ * The path to the image should be relative to the HTML file
+ * that links in your sketch. Loading an from a URL or other
+ * remote location may be blocked due to your browser's built-in
+ * security.
+ *
+ * @method loadImage
+ * @param  {String} path Path of the image to be loaded
+ * @param  {Function(p5.Image)} [successCallback] Function to be called once
+ *                                the image is loaded. Will be passed the
+ *                                p5.Image.
+ * @param  {Function(Event)}    [failureCallback] called with event error if
+ *                                the image fails to load.
+ * @return {p5.Image}             the p5.Image object
+ * @example
+ * <div>
+ * <code>
+ * var img;
+ * function preload() {
+ *   img = loadImage("assets/laDefense.jpg");
+ * }
+ * function setup() {
+ *   image(img, 0, 0);
+ * }
+ * </code>
+ * </div>
+ * <div>
+ * <code>
+ * function setup() {
+ *   // here we use a callback to display the image after loading
+ *   loadImage("assets/laDefense.jpg", function(img) {
+ *     image(img, 0, 0);
+ *   });
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype.loadImage = function(path, successCallback, failureCallback) {
+  var img = new Image();
+  var pImg = new p5.Image(1, 1, this);
+  var decrementPreload = p5._getDecrementPreload.apply(this, arguments);
+
+  img.onload = function() {
+    pImg.width = pImg.canvas.width = img.width;
+    pImg.height = pImg.canvas.height = img.height;
+
+    // Draw the image into the backing canvas of the p5.Image
+    pImg.drawingContext.drawImage(img, 0, 0);
+
+    if (typeof successCallback === 'function') {
+      successCallback(pImg);
+    }
+    if (decrementPreload && (successCallback !== decrementPreload)) {
+      decrementPreload();
+    }
+  };
+  img.onerror = function(e) {
+    p5._friendlyFileLoadError(0,img.src);
+    // don't get failure callback mixed up with decrementPreload
+    if ((typeof failureCallback === 'function') &&
+      (failureCallback !== decrementPreload)) {
+      failureCallback(e);
+    }
+  };
+
+  //set crossOrigin in case image is served which CORS headers
+  //this will let us draw to canvas without tainting it.
+  //see https://developer.mozilla.org/en-US/docs/HTML/CORS_Enabled_Image
+  // When using data-uris the file will be loaded locally
+  // so we don't need to worry about crossOrigin with base64 file types
+  if(path.indexOf('data:image/') !== 0) {
+    img.crossOrigin = 'Anonymous';
+  }
+
+  //start loading the image
+  img.src = path;
+
+  return pImg;
+};
+
+/**
+ * Validates clipping params. Per drawImage spec sWidth and sHight cannot be
+ * negative or greater than image intrinsic width and height
+ * @private
+ * @param {Number} sVal
+ * @param {Number} iVal
+ * @returns {Number}
+ * @private
+ */
+function _sAssign(sVal, iVal) {
+  if (sVal > 0 && sVal < iVal) {
+    return sVal;
+  }
+  else {
+    return iVal;
+  }
+}
+
+/**
+ * Draw an image to the main canvas of the p5js sketch
+ *
+ * @method image
+ * @param  {p5.Image} img    the image to display
+ * @param  {Number}   [sx=0]   The X coordinate of the top left corner of the
+ *                             sub-rectangle of the source image to draw into
+ *                             the destination canvas.
+ * @param  {Number}   [sy=0]   The Y coordinate of the top left corner of the
+ *                             sub-rectangle of the source image to draw into
+ *                             the destination canvas.
+ * @param {Number} [sWidth=img.width] The width of the sub-rectangle of the
+ *                                    source image to draw into the destination
+ *                                    canvas.
+ * @param {Number} [sHeight=img.height] The height of the sub-rectangle of the
+ *                                      source image to draw into the
+ *                                      destination context.
+ * @param  {Number}   [dx=0]    The X coordinate in the destination canvas at
+ *                              which to place the top-left corner of the
+ *                              source image.
+ * @param  {Number}   [dy=0]    The Y coordinate in the destination canvas at
+ *                              which to place the top-left corner of the
+ *                              source image.
+ * @param  {Number}   [dWidth]  The width to draw the image in the destination
+ *                              canvas. This allows scaling of the drawn image.
+ * @param  {Number}   [dHeight] The height to draw the image in the destination
+ *                              canvas. This allows scaling of the drawn image.
+ * @example
+ * <div>
+ * <code>
+ * var img;
+ * function preload() {
+ *   img = loadImage("assets/laDefense.jpg");
+ * }
+ * function setup() {
+ *   image(img, 0, 0);
+ *   image(img, 0, 0, 100, 100);
+ *   image(img, 0, 0, 100, 100, 0, 0, 100, 100);
+ * }
+ * </code>
+ * </div>
+ * <div>
+ * <code>
+ * function setup() {
+ *   // here we use a callback to display the image after loading
+ *   loadImage("assets/laDefense.jpg", function(img) {
+ *     image(img, 0, 0);
+ *   });
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype.image =
+  function(img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight) {
+  // Temporarily disabling until options for p5.Graphics are added.
+  // var args = new Array(arguments.length);
+  // for (var i = 0; i < args.length; ++i) {
+  //   args[i] = arguments[i];
+  // }
+  // this._validateParameters(
+  //   'image',
+  //   args,
+  //   [
+  //     ['p5.Image', 'Number', 'Number'],
+  //     ['p5.Image', 'Number', 'Number', 'Number', 'Number']
+  //   ]
+  // );
+
+  // set defaults per spec: https://goo.gl/3ykfOq
+  if (arguments.length <= 5) {
+    dx = sx || 0;
+    dy = sy || 0;
+    sx = 0;
+    sy = 0;
+    if (img.elt && img.elt.videoWidth && !img.canvas) { // video no canvas
+      var actualW = img.elt.videoWidth;
+      var actualH = img.elt.videoHeight;
+      dWidth = sWidth || img.elt.width;
+      dHeight = sHeight || img.elt.width*actualH/actualW;
+      sWidth = actualW;
+      sHeight = actualH;
+    } else {
+      dWidth = sWidth || img.width;
+      dHeight = sHeight || img.height;
+      sWidth = img.width;
+      sHeight = img.height;
+    }
+  } else if (arguments.length === 9) {
+    sx = sx || 0;
+    sy = sy || 0;
+    sWidth = _sAssign(sWidth, img.width);
+    sHeight = _sAssign(sHeight, img.height);
+
+    dx = dx || 0;
+    dy = dy || 0;
+    dWidth = dWidth || img.width;
+    dHeight = dHeight || img.height;
+  } else {
+    throw 'Wrong number of arguments to image()';
+  }
+
+  var vals = canvas.modeAdjust(dx, dy, dWidth, dHeight,
+    this._renderer._imageMode);
+
+  // tint the image if there is a tint
+  this._renderer.image(img, sx, sy, sWidth, sHeight, vals.x, vals.y, vals.w,
+    vals.h);
+};
+
+/**
+ * Sets the fill value for displaying images. Images can be tinted to
+ * specified colors or made transparent by including an alpha value.
+ * <br><br>
+ * To apply transparency to an image without affecting its color, use
+ * white as the tint color and specify an alpha value. For instance,
+ * tint(255, 128) will make an image 50% transparent (assuming the default
+ * alpha range of 0-255, which can be changed with colorMode()).
+ * <br><br>
+ * The value for the gray parameter must be less than or equal to the current
+ * maximum value as specified by colorMode(). The default maximum value is
+ * 255.
+ *
+ * @method tint
+ * @param {Number|Array} v1   gray value, red or hue value (depending on the
+ *                            current color mode), or color Array
+ * @param {Number|Array} [v2] green or saturation value (depending on the
+ *                            current color mode)
+ * @param {Number|Array} [v3] blue or brightness value (depending on the
+ *                            current color mode)
+ * @param {Number|Array} [a]  opacity of the background
+ * @example
+ * <div>
+ * <code>
+ * var img;
+ * function preload() {
+ *   img = loadImage("assets/laDefense.jpg");
+ * }
+ * function setup() {
+ *   image(img, 0, 0);
+ *   tint(0, 153, 204);  // Tint blue
+ *   image(img, 50, 0);
+ * }
+ * </code>
+ * </div>
+ *
+ * <div>
+ * <code>
+ * var img;
+ * function preload() {
+ *   img = loadImage("assets/laDefense.jpg");
+ * }
+ * function setup() {
+ *   image(img, 0, 0);
+ *   tint(0, 153, 204, 126);  // Tint blue and set transparency
+ *   image(img, 50, 0);
+ * }
+ * </code>
+ * </div>
+ *
+ * <div>
+ * <code>
+ * var img;
+ * function preload() {
+ *   img = loadImage("assets/laDefense.jpg");
+ * }
+ * function setup() {
+ *   image(img, 0, 0);
+ *   tint(255, 126);  // Apply transparency without changing color
+ *   image(img, 50, 0);
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype.tint = function () {
+  var c = this.color.apply(this, arguments);
+  this._renderer._tint = c.levels;
+};
+
+/**
+ * Removes the current fill value for displaying images and reverts to
+ * displaying images with their original hues.
+ *
+ * @method noTint
+ * @example
+ * <div>
+ * <code>
+ * var img;
+ * function preload() {
+ *   img = loadImage("assets/bricks.jpg");
+ * }
+ * function setup() {
+ *   tint(0, 153, 204);  // Tint blue
+ *   image(img, 0, 0);
+ *   noTint();  // Disable tint
+ *   image(img, 50, 0);
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype.noTint = function() {
+  this._renderer._tint = null;
+};
+
+/**
+ * Apply the current tint color to the input image, return the resulting
+ * canvas.
+ *
+ * @param {p5.Image} The image to be tinted
+ * @return {canvas} The resulting tinted canvas
+ *
+ */
+p5.prototype._getTintedImageCanvas = function(img) {
+  if (!img.canvas) {
+    return img;
+  }
+  var pixels = Filters._toPixels(img.canvas);
+  var tmpCanvas = document.createElement('canvas');
+  tmpCanvas.width = img.canvas.width;
+  tmpCanvas.height = img.canvas.height;
+  var tmpCtx = tmpCanvas.getContext('2d');
+  var id = tmpCtx.createImageData(img.canvas.width, img.canvas.height);
+  var newPixels = id.data;
+
+  for(var i = 0; i < pixels.length; i += 4) {
+    var r = pixels[i];
+    var g = pixels[i+1];
+    var b = pixels[i+2];
+    var a = pixels[i+3];
+
+    newPixels[i] = r*this._renderer._tint[0]/255;
+    newPixels[i+1] = g*this._renderer._tint[1]/255;
+    newPixels[i+2] = b*this._renderer._tint[2]/255;
+    newPixels[i+3] = a*this._renderer._tint[3]/255;
+  }
+
+  tmpCtx.putImageData(id, 0, 0);
+  return tmpCanvas;
+};
+
+/**
+ * Set image mode. Modifies the location from which images are drawn by
+ * changing the way in which parameters given to image() are interpreted.
+ * The default mode is imageMode(CORNER), which interprets the second and
+ * third parameters of image() as the upper-left corner of the image. If
+ * two additional parameters are specified, they are used to set the image's
+ * width and height.
+ * <br><br>
+ * imageMode(CORNERS) interprets the second and third parameters of image()
+ * as the location of one corner, and the fourth and fifth parameters as the
+ * opposite corner.
+ * <br><br>
+ * imageMode(CENTER) interprets the second and third parameters of image()
+ * as the image's center point. If two additional parameters are specified,
+ * they are used to set the image's width and height.
+ *
+ * @method imageMode
+ * @param {String} m The mode: either CORNER, CORNERS, or CENTER.
+ * @example
+ *
+ * <div>
+ * <code>
+ * var img;
+ * function preload() {
+ *   img = loadImage("assets/bricks.jpg");
+ * }
+ * function setup() {
+ *   imageMode(CORNER);
+ *   image(img, 10, 10, 50, 50);
+ * }
+ * </code>
+ * </div>
+ *
+ * <div>
+ * <code>
+ * var img;
+ * function preload() {
+ *   img = loadImage("assets/bricks.jpg");
+ * }
+ * function setup() {
+ *   imageMode(CORNERS);
+ *   image(img, 10, 10, 90, 40);
+ * }
+ * </code>
+ * </div>
+ *
+ * <div>
+ * <code>
+ * var img;
+ * function preload() {
+ *   img = loadImage("assets/bricks.jpg");
+ * }
+ * function setup() {
+ *   imageMode(CENTER);
+ *   image(img, 50, 50, 80, 80);
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype.imageMode = function(m) {
+  if (m === constants.CORNER ||
+    m === constants.CORNERS ||
+    m === constants.CENTER) {
+    this._renderer._imageMode = m;
+  }
+};
+
+
+module.exports = p5;
+
+},{"../core/canvas":46,"../core/constants":47,"../core/core":48,"../core/error_helpers":51,"./filters":65}],68:[function(_dereq_,module,exports){
+/**
+ * @module Image
+ * @submodule Image
+ * @requires core
+ * @requires constants
+ * @requires filters
+ */
+
+/**
+ * This module defines the p5.Image class and P5 methods for
+ * drawing images to the main display canvas.
+ */
+
+'use strict';
+
+var p5 = _dereq_('../core/core');
+var Filters = _dereq_('./filters');
+
+/*
+ * Class methods
+ */
+
+/**
+ * Creates a new p5.Image. A p5.Image is a canvas backed representation of an
+ * image.
+ * <br><br>
+ * p5 can display .gif, .jpg and .png images. Images may be displayed
+ * in 2D and 3D space. Before an image is used, it must be loaded with the
+ * loadImage() function. The p5.Image class contains fields for the width and
+ * height of the image, as well as an array called pixels[] that contains the
+ * values for every pixel in the image.
+ * <br><br>
+ * The methods described below allow easy access to the image's pixels and
+ * alpha channel and simplify the process of compositing.
+ * <br><br>
+ * Before using the pixels[] array, be sure to use the loadPixels() method on
+ * the image to make sure that the pixel data is properly loaded.
+ *
+ * @class p5.Image
+ * @constructor
+ * @param {Number} width
+ * @param {Number} height
+ * @param {Object} pInst An instance of a p5 sketch.
+ */
+p5.Image = function(width, height){
+  /**
+   * Image width.
+   * @property width
+   * @example
+   * <div><code>
+   * var img;
+   * function preload() {
+   *   img = loadImage("assets/rockies.jpg");
+   * }
+   *
+   * function setup() {
+   *   createCanvas(100, 100);
+   *   image(img, 0, 0);
+   *   for (var i=0; i < img.width; i++) {
+   *     var c = img.get(i, img.height/2);
+   *     stroke(c);
+   *     line(i, height/2, i, height);
+   *   }
+   * }
+   * </code></div>
+   */
+  this.width = width;
+  /**
+   * Image height.
+   * @property height
+   * @example
+   * <div><code>
+   * var img;
+   * function preload() {
+   *   img = loadImage("assets/rockies.jpg");
+   * }
+   *
+   * function setup() {
+   *   createCanvas(100, 100);
+   *   image(img, 0, 0);
+   *   for (var i=0; i < img.height; i++) {
+   *     var c = img.get(img.width/2, i);
+   *     stroke(c);
+   *     line(0, i, width/2, i);
+   *   }
+   * }
+   * </code></div>
+   */
+  this.height = height;
+  this.canvas = document.createElement('canvas');
+  this.canvas.width = this.width;
+  this.canvas.height = this.height;
+  this.drawingContext = this.canvas.getContext('2d');
+  this._pixelDensity = 1;
+  //used for webgl texturing only
+  this.isTexture = false;
+  /**
+   * Array containing the values for all the pixels in the display window.
+   * These values are numbers. This array is the size (include an appropriate
+   * factor for pixelDensity) of the display window x4,
+   * representing the R, G, B, A values in order for each pixel, moving from
+   * left to right across each row, then down each column. Retina and other
+   * high denisty displays may have more pixels[] (by a factor of
+   * pixelDensity^2).
+   * For example, if the image is 100x100 pixels, there will be 40,000. With
+   * pixelDensity = 2, there will be 160,000. The first four values
+   * (indices 0-3) in the array will be the R, G, B, A values of the pixel at
+   * (0, 0). The second four values (indices 4-7) will contain the R, G, B, A
+   * values of the pixel at (1, 0). More generally, to set values for a pixel
+   * at (x, y):
+   * <code><pre>var d = pixelDensity;
+   * for (var i = 0; i < d; i++) {
+   *   for (var j = 0; j < d; j++) {
+   *     // loop over
+   *     idx = 4*((y * d + j) * width * d + (x * d + i));
+   *     pixels[idx] = r;
+   *     pixels[idx+1] = g;
+   *     pixels[idx+2] = b;
+   *     pixels[idx+3] = a;
+   *   }
+   * }
+   * </pre></code>
+   * <br><br>
+   * Before accessing this array, the data must loaded with the loadPixels()
+   * function. After the array data has been modified, the updatePixels()
+   * function must be run to update the changes.
+   * @property pixels[]
+   * @example
+   * <div>
+   * <code>
+   * img = createImage(66, 66);
+   * img.loadPixels();
+   * for (i = 0; i < img.width; i++) {
+   *   for (j = 0; j < img.height; j++) {
+   *     img.set(i, j, color(0, 90, 102));
+   *   }
+   * }
+   * img.updatePixels();
+   * image(img, 17, 17);
+   * </code>
+   * </div>
+   * <div>
+   * <code>
+   * var pink = color(255, 102, 204);
+   * img = createImage(66, 66);
+   * img.loadPixels();
+   * for (var i = 0; i < 4*(width*height/2); i+=4) {
+   *   img.pixels[i] = red(pink);
+   *   img.pixels[i+1] = green(pink);
+   *   img.pixels[i+2] = blue(pink);
+   *   img.pixels[i+3] = alpha(pink);
+   * }
+   * img.updatePixels();
+   * image(img, 17, 17);
+   * </code>
+   * </div>
+   */
+  this.pixels = [];
+};
+
+/**
+ * Helper fxn for sharing pixel methods
+ *
+ */
+p5.Image.prototype._setProperty = function (prop, value) {
+  this[prop] = value;
+};
+
+/**
+ * Loads the pixels data for this image into the [pixels] attribute.
+ *
+ * @method loadPixels
+ * @example
+ * <div><code>
+ * var myImage;
+ * var halfImage;
+ *
+ * function preload() {
+ *   myImage = loadImage("assets/rockies.jpg");
+ * }
+ *
+ * function setup() {
+ *   myImage.loadPixels();
+ *   halfImage = 4 * width * height/2;
+ *   for(var i = 0; i < halfImage; i++){
+ *     myImage.pixels[i+halfImage] = myImage.pixels[i];
+ *   }
+ *   myImage.updatePixels();
+ * }
+ *
+ * function draw() {
+ *   image(myImage, 0, 0);
+ * }
+ * </code></div>
+ */
+p5.Image.prototype.loadPixels = function(){
+  p5.Renderer2D.prototype.loadPixels.call(this);
+};
+
+/**
+ * Updates the backing canvas for this image with the contents of
+ * the [pixels] array.
+ *
+ * @method updatePixels
+ * @param {Integer|undefined} x x-offset of the target update area for the
+ *                              underlying canvas
+ * @param {Integer|undefined} y y-offset of the target update area for the
+ *                              underlying canvas
+ * @param {Integer|undefined} w height of the target update area for the
+ *                              underlying canvas
+ * @param {Integer|undefined} h height of the target update area for the
+ *                              underlying canvas
+ * @example
+ * <div><code>
+ * var myImage;
+ * var halfImage;
+ *
+ * function preload() {
+ *   myImage = loadImage("assets/rockies.jpg");
+ * }
+ *
+ * function setup() {
+ *   myImage.loadPixels();
+ *   halfImage = 4 * width * height/2;
+ *   for(var i = 0; i < halfImage; i++){
+ *     myImage.pixels[i+halfImage] = myImage.pixels[i];
+ *   }
+ *   myImage.updatePixels();
+ * }
+ *
+ * function draw() {
+ *   image(myImage, 0, 0);
+ * }
+ * </code></div>
+ */
+p5.Image.prototype.updatePixels = function(x, y, w, h){
+  p5.Renderer2D.prototype.updatePixels.call(this, x, y, w, h);
+};
+
+/**
+ * Get a region of pixels from an image.
+ *
+ * If no params are passed, those whole image is returned,
+ * if x and y are the only params passed a single pixel is extracted
+ * if all params are passed a rectangle region is extracted and a p5.Image
+ * is returned.
+ *
+ * Returns undefined if the region is outside the bounds of the image
+ *
+ * @method get
+ * @param  {Number}               [x] x-coordinate of the pixel
+ * @param  {Number}               [y] y-coordinate of the pixel
+ * @param  {Number}               [w] width
+ * @param  {Number}               [h] height
+ * @return {Array/Color | p5.Image}     color of pixel at x,y in array format
+ *                                    [R, G, B, A] or p5.Image
+ * @example
+ * <div><code>
+ * var myImage;
+ * var c;
+ *
+ * function preload() {
+ *   myImage = loadImage("assets/rockies.jpg");
+ * }
+ *
+ * function setup() {
+ *   background(myImage);
+ *   noStroke();
+ *   c = myImage.get(60, 90);
+ *   fill(c);
+ *   rect(25, 25, 50, 50);
+ * }
+ *
+ * //get() returns color here
+ * </code></div>
+ */
+p5.Image.prototype.get = function(x, y, w, h){
+  return p5.Renderer2D.prototype.get.call(this, x, y, w, h);
+};
+
+/**
+ * Set the color of a single pixel or write an image into
+ * this p5.Image.
+ *
+ * Note that for a large number of pixels this will
+ * be slower than directly manipulating the pixels array
+ * and then calling updatePixels().
+ *
+ * @method set
+ * @param {Number}              x x-coordinate of the pixel
+ * @param {Number}              y y-coordinate of the pixel
+ * @param {Number|Array|Object}   a grayscale value | pixel array |
+ *                                a p5.Color | image to copy
+ * @example
+ * <div>
+ * <code>
+ * img = createImage(66, 66);
+ * img.loadPixels();
+ * for (i = 0; i < img.width; i++) {
+ *   for (j = 0; j < img.height; j++) {
+ *     img.set(i, j, color(0, 90, 102, i % img.width * 2));
+ *   }
+ * }
+ * img.updatePixels();
+ * image(img, 17, 17);
+ * image(img, 34, 34);
+ * </code>
+ * </div>
+ */
+p5.Image.prototype.set = function(x, y, imgOrCol){
+  p5.Renderer2D.prototype.set.call(this, x, y, imgOrCol);
+};
+
+/**
+ * Resize the image to a new width and height. To make the image scale
+ * proportionally, use 0 as the value for the wide or high parameter.
+ * For instance, to make the width of an image 150 pixels, and change
+ * the height using the same proportion, use resize(150, 0).
+ *
+ * @method resize
+ * @param {Number} width the resized image width
+ * @param {Number} height the resized image height
+ * @example
+ * <div><code>
+ * var img;
+ *
+ * function setup() {
+ *   img = loadImage("assets/rockies.jpg");
+ * }
+ * function draw() {
+ *   image(img, 0, 0);
+ * }
+ *
+ * function mousePressed() {
+ *   img.resize(50, 100);
+ * }
+ * </code></div>
+ */
+p5.Image.prototype.resize = function(width, height){
+
+  // Copy contents to a temporary canvas, resize the original
+  // and then copy back.
+  //
+  // There is a faster approach that involves just one copy and swapping the
+  // this.canvas reference. We could switch to that approach if (as i think
+  // is the case) there an expectation that the user would not hold a
+  // reference to the backing canvas of a p5.Image. But since we do not
+  // enforce that at the moment, I am leaving in the slower, but safer
+  // implementation.
+
+  // auto-resize
+  if (width === 0 && height === 0) {
+    width = this.canvas.width;
+    height = this.canvas.height;
+  } else if (width === 0) {
+    width = this.canvas.width * height / this.canvas.height;
+  } else if (height === 0) {
+    height = this.canvas.height * width / this.canvas.width;
+  }
+
+  var tempCanvas = document.createElement('canvas');
+  tempCanvas.width = width;
+  tempCanvas.height = height;
+  tempCanvas.getContext('2d').drawImage(this.canvas,
+    0, 0, this.canvas.width, this.canvas.height,
+    0, 0, tempCanvas.width, tempCanvas.height
+  );
+
+
+  // Resize the original canvas, which will clear its contents
+  this.canvas.width = this.width = width;
+  this.canvas.height = this.height = height;
+
+  //Copy the image back
+
+  this.drawingContext.drawImage(tempCanvas,
+    0, 0, width, height,
+    0, 0, width, height
+  );
+
+  if(this.pixels.length > 0){
+    this.loadPixels();
+  }
+};
+
+/**
+ * Copies a region of pixels from one image to another. If no
+ * srcImage is specified this is used as the source. If the source
+ * and destination regions aren't the same size, it will
+ * automatically resize source pixels to fit the specified
+ * target region.
+ *
+ * @method copy
+ * @param  {p5.Image|undefined} srcImage source image
+ * @param  {Integer} sx X coordinate of the source's upper left corner
+ * @param  {Integer} sy Y coordinate of the source's upper left corner
+ * @param  {Integer} sw source image width
+ * @param  {Integer} sh source image height
+ * @param  {Integer} dx X coordinate of the destination's upper left corner
+ * @param  {Integer} dy Y coordinate of the destination's upper left corner
+ * @param  {Integer} dw destination image width
+ * @param  {Integer} dh destination image height
+ * @example
+ * <div><code>
+ * var photo;
+ * var bricks;
+ * var x;
+ * var y;
+ *
+ * function preload() {
+ *   photo = loadImage("assets/rockies.jpg");
+ *   bricks = loadImage("assets/bricks.jpg");
+ * }
+ *
+ * function setup() {
+ *   x = bricks.width/2;
+ *   y = bricks.height/2;
+ *   photo.copy(bricks, 0, 0, x, y, 0, 0, x, y);
+ *   image(photo, 0, 0);
+ * }
+ * </code></div>
+ */
+p5.Image.prototype.copy = function () {
+  p5.prototype.copy.apply(this, arguments);
+};
+
+/**
+ * Masks part of an image from displaying by loading another
+ * image and using it's blue channel as an alpha channel for
+ * this image.
+ *
+ * @method mask
+ * @param {p5.Image} srcImage source image
+ * @example
+ * <div><code>
+ * var photo, maskImage;
+ * function preload() {
+ *   photo = loadImage("assets/rockies.jpg");
+ *   maskImage = loadImage("assets/mask2.png");
+ * }
+ *
+ * function setup() {
+ *   createCanvas(100, 100);
+ *   photo.mask(maskImage);
+ *   image(photo, 0, 0);
+ * }
+ * </code></div>
+ *
+ * http://blogs.adobe.com/webplatform/2013/01/28/blending-features-in-canvas/
+ *
+ */
+// TODO: - Accept an array of alpha values.
+//       - Use other channels of an image. p5 uses the
+//       blue channel (which feels kind of arbitrary). Note: at the
+//       moment this method does not match native processings original
+//       functionality exactly.
+p5.Image.prototype.mask = function(p5Image) {
+  if(p5Image === undefined){
+    p5Image = this;
+  }
+  var currBlend = this.drawingContext.globalCompositeOperation;
+
+  var scaleFactor = 1;
+  if (p5Image instanceof p5.Renderer) {
+    scaleFactor = p5Image._pInst._pixelDensity;
+  }
+
+  var copyArgs = [
+    p5Image,
+    0,
+    0,
+    scaleFactor*p5Image.width,
+    scaleFactor*p5Image.height,
+    0,
+    0,
+    this.width,
+    this.height
+  ];
+
+  this.drawingContext.globalCompositeOperation = 'destination-in';
+  this.copy.apply(this, copyArgs);
+  this.drawingContext.globalCompositeOperation = currBlend;
+};
+
+/**
+ * Applies an image filter to a p5.Image
+ *
+ * @method filter
+ * @param {String} operation one of threshold, gray, invert, posterize and
+ *                           opaque see Filters.js for docs on each available
+ *                           filter
+ * @param {Number|undefined} value
+ * @example
+ * <div><code>
+ * var photo1;
+ * var photo2;
+ *
+ * function preload() {
+ *   photo1 = loadImage("assets/rockies.jpg");
+ *   photo2 = loadImage("assets/rockies.jpg");
+ * }
+ *
+ * function setup() {
+ *   photo2.filter("gray");
+ *   image(photo1, 0, 0);
+ *   image(photo2, width/2, 0);
+ * }
+ * </code></div>
+ */
+p5.Image.prototype.filter = function(operation, value) {
+  Filters.apply(this.canvas, Filters[operation.toLowerCase()], value);
+};
+
+/**
+ * Copies a region of pixels from one image to another, using a specified
+ * blend mode to do the operation.
+ *
+ * @method blend
+ * @param  {p5.Image|undefined} srcImage source image
+ * @param  {Integer} sx X coordinate of the source's upper left corner
+ * @param  {Integer} sy Y coordinate of the source's upper left corner
+ * @param  {Integer} sw source image width
+ * @param  {Integer} sh source image height
+ * @param  {Integer} dx X coordinate of the destination's upper left corner
+ * @param  {Integer} dy Y coordinate of the destination's upper left corner
+ * @param  {Integer} dw destination image width
+ * @param  {Integer} dh destination image height
+ * @param  {Integer} blendMode the blend mode
+ *
+ * Available blend modes are: normal | multiply | screen | overlay |
+ *            darken | lighten | color-dodge | color-burn | hard-light |
+ *            soft-light | difference | exclusion | hue | saturation |
+ *            color | luminosity
+ *
+ *
+ * http://blogs.adobe.com/webplatform/2013/01/28/blending-features-in-canvas/
+ *
+ */
+p5.Image.prototype.blend = function() {
+  p5.prototype.blend.apply(this, arguments);
+};
+
+/**
+ * Saves the image to a file and force the browser to download it.
+ * Accepts two strings for filename and file extension
+ * Supports png (default) and jpg.
+ *
+ * @method save
+ * @param {String} filename give your file a name
+ * @param  {String} extension 'png' or 'jpg'
+ * @example
+ * <div><code>
+ * var photo;
+ *
+ * function preload() {
+ *   photo = loadImage("assets/rockies.jpg");
+ * }
+ *
+ * function draw() {
+ *   image(photo, 0, 0);
+ * }
+ *
+ * function keyTyped() {
+ *   if (key == 's') {
+ *     photo.save("photo", "png");
+ *   }
+ * }
+ * </code></div>
+ */
+p5.Image.prototype.save = function(filename, extension) {
+  var mimeType;
+  if (!extension) {
+    extension = 'png';
+    mimeType = 'image/png';
+  }
+  else {
+    // en.wikipedia.org/wiki/Comparison_of_web_browsers#Image_format_support
+    switch(extension.toLowerCase()){
+    case 'png':
+      mimeType = 'image/png';
+      break;
+    case 'jpeg':
+      mimeType = 'image/jpeg';
+      break;
+    case 'jpg':
+      mimeType = 'image/jpeg';
+      break;
+    default:
+      mimeType = 'image/png';
+      break;
+    }
+  }
+  var downloadMime = 'image/octet-stream';
+  var imageData = this.canvas.toDataURL(mimeType);
+  imageData = imageData.replace(mimeType, downloadMime);
+
+  //Make the browser download the file
+  p5.prototype.downloadFile(imageData, filename, extension);
+};
+
+/**
+ * creates a gl texture
+ * used in WEBGL mode only
+ * @param  {[type]} tex [description]
+ * @return {[type]}     [description]
+ */
+p5.Image.prototype.createTexture = function(tex){
+  //this.texture = tex;
+  return this;
+};
+
+module.exports = p5.Image;
+
+},{"../core/core":48,"./filters":65}],69:[function(_dereq_,module,exports){
+/**
+ * @module Image
+ * @submodule Pixels
+ * @for p5
+ * @requires core
+ */
+
+'use strict';
+
+var p5 = _dereq_('../core/core');
+var Filters = _dereq_('./filters');
+_dereq_('../color/p5.Color');
+
+/**
+ * <a href='https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference
+ * /Global_Objects/Uint8ClampedArray' target='_blank'>Uint8ClampedArray</a>
+ * containing the values for all the pixels in the display window.
+ * These values are numbers. This array is the size (include an appropriate
+ * factor for pixelDensity) of the display window x4,
+ * representing the R, G, B, A values in order for each pixel, moving from
+ * left to right across each row, then down each column. Retina and other
+ * high denisty displays will have more pixels[] (by a factor of
+ * pixelDensity^2).
+ * For example, if the image is 100x100 pixels, there will be 40,000. On a
+ * retina display, there will be 160,000.
+ * <br><br>
+ * The first four values (indices 0-3) in the array will be the R, G, B, A
+ * values of the pixel at (0, 0). The second four values (indices 4-7) will
+ * contain the R, G, B, A values of the pixel at (1, 0). More generally, to
+ * set values for a pixel at (x, y):
+ * <code><pre>
+ * var d = pixelDensity;
+ * for (var i = 0; i < d; i++) {
+ *   for (var j = 0; j < d; j++) {
+ *     // loop over
+ *     idx = 4 * ((y * d + j) * width * d + (x * d + i));
+ *     pixels[idx] = r;
+ *     pixels[idx+1] = g;
+ *     pixels[idx+2] = b;
+ *     pixels[idx+3] = a;
+ *   }
+ * }
+ * </pre></code>
+ *
+ * <p>While the above method is complex, it is flexible enough to work with
+ * any pixelDensity. Note that set() will automatically take care of
+ * setting all the appropriate values in pixels[] for a given (x, y) at
+ * any pixelDensity, but the performance may not be as fast when lots of
+ * modifications are made to the pixel array.
+ * <br><br>
+ * Before accessing this array, the data must loaded with the loadPixels()
+ * function. After the array data has been modified, the updatePixels()
+ * function must be run to update the changes.
+ * <br><br>
+ * Note that this is not a standard javascript array.  This means that
+ * standard javascript functions such as <code>slice()</code> or
+ * <code>arrayCopy()</code> do not
+ * work.</p>
+ *
+ * @property pixels[]
+ * @example
+ * <div>
+ * <code>
+ * var pink = color(255, 102, 204);
+ * loadPixels();
+ * var d = pixelDensity();
+ * var halfImage = 4 * (width * d) * (height/2 * d);
+ * for (var i = 0; i < halfImage; i+=4) {
+ *   pixels[i] = red(pink);
+ *   pixels[i+1] = green(pink);
+ *   pixels[i+2] = blue(pink);
+ *   pixels[i+3] = alpha(pink);
+ * }
+ * updatePixels();
+ * </code>
+ * </div>
+ */
+p5.prototype.pixels = [];
+
+/**
+ * Copies a region of pixels from one image to another, using a specified
+ * blend mode to do the operation.<br><br>
+ * Available blend modes are: BLEND | DARKEST | LIGHTEST | DIFFERENCE |
+ * MULTIPLY| EXCLUSION | SCREEN | REPLACE | OVERLAY | HARD_LIGHT |
+ * SOFT_LIGHT | DODGE | BURN | ADD | NORMAL
+ *
+ *
+ * @method blend
+ * @param  {p5.Image|undefined} srcImage source image
+ * @param  {Integer} sx X coordinate of the source's upper left corner
+ * @param  {Integer} sy Y coordinate of the source's upper left corner
+ * @param  {Integer} sw source image width
+ * @param  {Integer} sh source image height
+ * @param  {Integer} dx X coordinate of the destination's upper left corner
+ * @param  {Integer} dy Y coordinate of the destination's upper left corner
+ * @param  {Integer} dw destination image width
+ * @param  {Integer} dh destination image height
+ * @param  {Integer} blendMode the blend mode
+ *
+ * @example
+ * <div><code>
+ * var img0;
+ * var img1;
+ *
+ * function preload() {
+ *   img0 = loadImage("assets/rockies.jpg");
+ *   img1 = loadImage("assets/bricks_third.jpg");
+ * }
+ *
+ * function setup() {
+ *   background(img0);
+ *   image(img1, 0, 0);
+ *   blend(img1, 0, 0, 33, 100, 67, 0, 33, 100, LIGHTEST);
+ * }
+ * </code></div>
+ * <div><code>
+ * var img0;
+ * var img1;
+ *
+ * function preload() {
+ *   img0 = loadImage("assets/rockies.jpg");
+ *   img1 = loadImage("assets/bricks_third.jpg");
+ * }
+ *
+ * function setup() {
+ *   background(img0);
+ *   image(img1, 0, 0);
+ *   blend(img1, 0, 0, 33, 100, 67, 0, 33, 100, DARKEST);
+ * }
+ * </code></div>
+ * <div><code>
+ * var img0;
+ * var img1;
+ *
+ * function preload() {
+ *   img0 = loadImage("assets/rockies.jpg");
+ *   img1 = loadImage("assets/bricks_third.jpg");
+ * }
+ *
+ * function setup() {
+ *   background(img0);
+ *   image(img1, 0, 0);
+ *   blend(img1, 0, 0, 33, 100, 67, 0, 33, 100, ADD);
+ * }
+ * </code></div>
+ */
+p5.prototype.blend = function() {
+  this._renderer.blend.apply(this._renderer, arguments);
+};
+
+/**
+ * Copies a region of the canvas to another region of the canvas
+ * and copies a region of pixels from an image used as the srcImg parameter
+ * into the canvas srcImage is specified this is used as the source. If
+ * the source and destination regions aren't the same size, it will
+ * automatically resize source pixels to fit the specified
+ * target region.
+ *
+ * @method copy
+ * @param  {p5.Image|undefined} srcImage source image
+ * @param  {Integer} sx X coordinate of the source's upper left corner
+ * @param  {Integer} sy Y coordinate of the source's upper left corner
+ * @param  {Integer} sw source image width
+ * @param  {Integer} sh source image height
+ * @param  {Integer} dx X coordinate of the destination's upper left corner
+ * @param  {Integer} dy Y coordinate of the destination's upper left corner
+ * @param  {Integer} dw destination image width
+ * @param  {Integer} dh destination image height
+ *
+ * @example
+ * <div><code>
+ * var img;
+ *
+ * function preload() {
+ *   img = loadImage("assets/rockies.jpg");
+ * }
+ *
+ * function setup() {
+ *   background(img);
+ *   copy(img, 7, 22, 10, 10, 35, 25, 50, 50);
+ *   stroke(255);
+ *   noFill();
+ *   // Rectangle shows area being copied
+ *   rect(7, 22, 10, 10);
+ * }
+ * </code></div>
+ */
+p5.prototype.copy = function () {
+  p5.Renderer2D._copyHelper.apply(this, arguments);
+};
+
+/**
+ * Applies a filter to the canvas.
+ * <br><br>
+ *
+ * The presets options are:
+ * <br><br>
+ *
+ * THRESHOLD
+ * Converts the image to black and white pixels depending if they are above or
+ * below the threshold defined by the level parameter. The parameter must be
+ * between 0.0 (black) and 1.0 (white). If no level is specified, 0.5 is used.
+ * <br><br>
+ *
+ * GRAY
+ * Converts any colors in the image to grayscale equivalents. No parameter
+ * is used.
+ * <br><br>
+ *
+ * OPAQUE
+ * Sets the alpha channel to entirely opaque. No parameter is used.
+ * <br><br>
+ *
+ * INVERT
+ * Sets each pixel to its inverse value. No parameter is used.
+ * <br><br>
+ *
+ * POSTERIZE
+ * Limits each channel of the image to the number of colors specified as the
+ * parameter. The parameter can be set to values between 2 and 255, but
+ * results are most noticeable in the lower ranges.
+ * <br><br>
+ *
+ * BLUR
+ * Executes a Guassian blur with the level parameter specifying the extent
+ * of the blurring. If no parameter is used, the blur is equivalent to
+ * Guassian blur of radius 1. Larger values increase the blur.
+ * <br><br>
+ *
+ * ERODE
+ * Reduces the light areas. No parameter is used.
+ * <br><br>
+ *
+ * DILATE
+ * Increases the light areas. No parameter is used.
+ *
+ * @method filter
+ * @param  {String} filterType
+ * @param  {Number} filterParam an optional parameter unique
+ *  to each filter, see above
+ *
+ *
+ * @example
+ * <div>
+ * <code>
+ * var img;
+ * function preload() {
+ *   img = loadImage("assets/bricks.jpg");
+ * }
+ * function setup() {
+ *  image(img, 0, 0);
+ *  filter(THRESHOLD);
+ * }
+ * </code>
+ * </div>
+ *
+ * <div>
+ * <code>
+ * var img;
+ * function preload() {
+ *   img = loadImage("assets/bricks.jpg");
+ * }
+ * function setup() {
+ *  image(img, 0, 0);
+ *  filter(GRAY);
+ * }
+ * </code>
+ * </div>
+ *
+ * <div>
+ * <code>
+ * var img;
+ * function preload() {
+ *   img = loadImage("assets/bricks.jpg");
+ * }
+ * function setup() {
+ *  image(img, 0, 0);
+ *  filter(OPAQUE);
+ * }
+ * </code>
+ * </div>
+ *
+ * <div>
+ * <code>
+ * var img;
+ * function preload() {
+ *   img = loadImage("assets/bricks.jpg");
+ * }
+ * function setup() {
+ *  image(img, 0, 0);
+ *  filter(INVERT);
+ * }
+ * </code>
+ * </div>
+ *
+ * <div>
+ * <code>
+ * var img;
+ * function preload() {
+ *   img = loadImage("assets/bricks.jpg");
+ * }
+ * function setup() {
+ *  image(img, 0, 0);
+ *  filter(POSTERIZE,3);
+ * }
+ * </code>
+ * </div>
+ *
+ * <div>
+ * <code>
+ * var img;
+ * function preload() {
+ *   img = loadImage("assets/bricks.jpg");
+ * }
+ * function setup() {
+ *  image(img, 0, 0);
+ *  filter(DILATE);
+ * }
+ * </code>
+ * </div>
+ *
+ * <div>
+ * <code>
+ * var img;
+ * function preload() {
+ *   img = loadImage("assets/bricks.jpg");
+ * }
+ * function setup() {
+ *  image(img, 0, 0);
+ *  filter(BLUR,3);
+ * }
+ * </code>
+ * </div>
+ *
+ * <div>
+ * <code>
+ * var img;
+ * function preload() {
+ *   img = loadImage("assets/bricks.jpg");
+ * }
+ * function setup() {
+ *  image(img, 0, 0);
+ *  filter(ERODE);
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype.filter = function(operation, value) {
+  Filters.apply(this.canvas, Filters[operation.toLowerCase()], value);
+};
+
+/**
+ * Returns an array of [R,G,B,A] values for any pixel or grabs a section of
+ * an image. If no parameters are specified, the entire image is returned.
+ * Use the x and y parameters to get the value of one pixel. Get a section of
+ * the display window by specifying additional w and h parameters. When
+ * getting an image, the x and y parameters define the coordinates for the
+ * upper-left corner of the image, regardless of the current imageMode().
+ * <br><br>
+ * If the pixel requested is outside of the image window, [0,0,0,255] is
+ * returned. To get the numbers scaled according to the current color ranges
+ * and taking into account colorMode, use getColor instead of get.
+ * <br><br>
+ * Getting the color of a single pixel with get(x, y) is easy, but not as fast
+ * as grabbing the data directly from pixels[]. The equivalent statement to
+ * get(x, y) using pixels[] with pixel density d is
+ * <code>[pixels[(y*width*d+x)*d],
+ * pixels[(y*width*d+x)*d+1],
+ * pixels[(y*width*d+x)*d+2],
+ * pixels[(y*width*d+x)*d+3]]</code>.
+ * <br><br>
+ * See the reference for pixels[] for more information.
+ *
+ * @method get
+ * @param  {Number}         [x] x-coordinate of the pixel
+ * @param  {Number}         [y] y-coordinate of the pixel
+ * @param  {Number}         [w] width
+ * @param  {Number}         [h] height
+ * @return {Array|p5.Image}     values of pixel at x,y in array format
+ *                              [R, G, B, A] or p5.Image
+ * @example
+ * <div>
+ * <code>
+ * var img;
+ * function preload() {
+ *   img = loadImage("assets/rockies.jpg");
+ * }
+ * function setup() {
+ *   image(img, 0, 0);
+ *   var c = get();
+ *   image(c, width/2, 0);
+ * }
+ * </code>
+ * </div>
+ *
+ * <div>
+ * <code>
+ * var img;
+ * function preload() {
+ *   img = loadImage("assets/rockies.jpg");
+ * }
+ * function setup() {
+ *   image(img, 0, 0);
+ *   var c = get(50, 90);
+ *   fill(c);
+ *   noStroke();
+ *   rect(25, 25, 50, 50);
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype.get = function(x, y, w, h){
+  return this._renderer.get(x, y, w, h);
+};
+
+/**
+ * Loads the pixel data for the display window into the pixels[] array. This
+ * function must always be called before reading from or writing to pixels[].
+ *
+ * @method loadPixels
+ * @example
+ * <div>
+ * <code>
+ * var img;
+ * function preload() {
+ *   img = loadImage("assets/rockies.jpg");
+ * }
+ *
+ * function setup() {
+ *   image(img, 0, 0);
+ *   var d = pixelDensity();
+ *   var halfImage = 4 * (img.width * d) *
+       (img.height/2 * d);
+ *   loadPixels();
+ *   for (var i = 0; i < halfImage; i++) {
+ *     pixels[i+halfImage] = pixels[i];
+ *   }
+ *   updatePixels();
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype.loadPixels = function() {
+  this._renderer.loadPixels();
+};
+
+/**
+ * <p>Changes the color of any pixel, or writes an image directly to the
+ * display window.</p>
+ * <p>The x and y parameters specify the pixel to change and the c parameter
+ * specifies the color value. This can be a p5.Color object, or [R, G, B, A]
+ * pixel array. It can also be a single grayscale value.
+ * When setting an image, the x and y parameters define the coordinates for
+ * the upper-left corner of the image, regardless of the current imageMode().
+ * </p>
+ * <p>
+ * After using set(), you must call updatePixels() for your changes to
+ * appear.  This should be called once all pixels have been set.
+ * </p>
+ * <p>Setting the color of a single pixel with set(x, y) is easy, but not as
+ * fast as putting the data directly into pixels[]. Setting the pixels[]
+ * values directly may be complicated when working with a retina display,
+ * but will perform better when lots of pixels need to be set directly on
+ * every loop.</p>
+ * <p>See the reference for pixels[] for more information.</p>
+ *
+ * @method set
+ * @param {Number}              x x-coordinate of the pixel
+ * @param {Number}              y y-coordinate of the pixel
+ * @param {Number|Array|Object} c insert a grayscale value | a pixel array |
+ *                                a p5.Color object | a p5.Image to copy
+ * @example
+ * <div>
+ * <code>
+ * var black = color(0);
+ * set(30, 20, black);
+ * set(85, 20, black);
+ * set(85, 75, black);
+ * set(30, 75, black);
+ * updatePixels();
+ * </code>
+ * </div>
+ *
+ * <div>
+ * <code>
+ * for (var i = 30; i < width-15; i++) {
+ *   for (var j = 20; j < height-25; j++) {
+ *     var c = color(204-j, 153-i, 0);
+ *     set(i, j, c);
+ *   }
+ * }
+ * updatePixels();
+ * </code>
+ * </div>
+ *
+ * <div>
+ * <code>
+ * var img;
+ * function preload() {
+ *   img = loadImage("assets/rockies.jpg");
+ * }
+ *
+ * function setup() {
+ *   set(0, 0, img);
+ *   updatePixels();
+ *   line(0, 0, width, height);
+ *   line(0, height, width, 0);
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype.set = function (x, y, imgOrCol) {
+  this._renderer.set(x, y, imgOrCol);
+};
+/**
+ * Updates the display window with the data in the pixels[] array.
+ * Use in conjunction with loadPixels(). If you're only reading pixels from
+ * the array, there's no need to call updatePixels() — updating is only
+ * necessary to apply changes. updatePixels() should be called anytime the
+ * pixels array is manipulated or set() is called.
+ *
+ * @method updatePixels
+ * @param  {Number} [x]    x-coordinate of the upper-left corner of region
+ *                         to update
+ * @param  {Number} [y]    y-coordinate of the upper-left corner of region
+ *                         to update
+ * @param  {Number} [w]    width of region to update
+ * @param  {Number} [w]    height of region to update
+ * @example
+ * <div>
+ * <code>
+ * var img;
+ * function preload() {
+ *   img = loadImage("assets/rockies.jpg");
+ * }
+ *
+ * function setup() {
+ *   image(img, 0, 0);
+ *   var halfImage = 4 * (img.width * pixelDensity()) *
+ *     (img.height * pixelDensity()/2);
+ *   loadPixels();
+ *   for (var i = 0; i < halfImage; i++) {
+ *     pixels[i+halfImage] = pixels[i];
+ *   }
+ *   updatePixels();
+ * }
+ * </code>
+ * </div>
+ */
+p5.prototype.updatePixels = function (x, y, w, h) {
+  // graceful fail - if loadPixels() or set() has not been called, pixel
+  // array will be empty, ignore call to updatePixels()
+  if (this.pixels.length === 0) {
+    return;
+  }
+  this._renderer.updatePixels(x, y, w, h);
+};
+
+module.exports = p5;
+
+},{"../color/p5.Color":42,"../core/core":48,"./filters":65}],70:[function(_dereq_,module,exports){
+/**
+ * @module IO
+ * @submodule Input
+ * @for p5
+ * @requires core
+ * @requires reqwest
+ */
+
+'use strict';
+
+var p5 = _dereq_('../core/core');
+var reqwest = _dereq_('reqwest');
+var opentype = _dereq_('opentype.js');
+_dereq_('../core/error_helpers');
+
+/**
+ * Checks if we are in preload and returns the last arg which will be the
+ * _decrementPreload function if called from a loadX() function.  Should
+ * only be used in loadX() functions.
+ * @private
+ */
+p5._getDecrementPreload = function () {
+  var decrementPreload = arguments[arguments.length - 1];
+
+  // when in preload decrementPreload will always be the last arg as it is set
+  // with args.push() before invocation in _wrapPreload
+  if ((window.preload || (this && this.preload)) &&
+    typeof decrementPreload === 'function') {
+    return decrementPreload;
+  } else {
+    return null;
+  }
+};
+
+/**
+ * Loads an opentype font file (.otf, .ttf) from a file or a URL,
+ * and returns a PFont Object. This method is asynchronous,
+ * meaning it may not finish before the next line in your sketch
+ * is executed.
+ * <br><br>
+ * The path to the font should be relative to the HTML file
+ * that links in your sketch. Loading an from a URL or other
+ * remote location may be blocked due to your browser's built-in
+ * security.
+ *
+ * @method loadFont
+ * @param  {String}        path       name of the file or url to load
+ * @param  {Function}      [callback] function to be executed after
+ *                                    loadFont()
+ *                                    completes
+ * @return {Object}                   p5.Font object
+ * @example
+ *
+ * <p>Calling loadFont() inside preload() guarantees that the load
+ * operation will have completed before setup() and draw() are called.</p>
+ *
+ * <div><code>
+ * var myFont;
+ * function preload() {
+ *   myFont = loadFont('assets/AvenirNextLTPro-Demi.otf');
+ * }
+ *
+ * function setup() {
+ *   fill('#ED225D');
+ *   textFont(myFont);
+ *   textSize(36);
+ *   text('p5*js', 10, 50);
+ * }
+ * </code></div>
+ *
+ * <p>Outside of preload(), you may supply a callback function to handle the
+ * object:</p>
+ *
+ * <div><code>
+ * function setup() {
+ *   loadFont('assets/AvenirNextLTPro-Demi.otf', drawText);
+ * }
+ *
+ * function drawText(font) {
+ *   fill('#ED225D');
+ *   textFont(font, 36);
+ *   text('p5*js', 10, 50);
+ * }
+ *
+ * </code></div>
+ *
+ * <p>You can also use the string name of the font to style other HTML
+ * elements.</p>
+ *
+ * <div><code>
+ * var myFont;
+ *
+ * function preload() {
+ *   myFont = loadFont('assets/Avenir.otf');
+ * }
+ *
+ * function setup() {
+ *   var myDiv = createDiv('hello there');
+ *   myDiv.style('font-family', 'Avenir');
+ * }
+ * </code></div>
+ */
+p5.prototype.loadFont = function (path, onSuccess, onError) {
+
+  var p5Font = new p5.Font(this);
+  var decrementPreload = p5._getDecrementPreload.apply(this, arguments);
+
+  opentype.load(path, function (err, font) {
+
+    if (err) {
+
+      if ((typeof onError !== 'undefined') && (onError !== decrementPreload)) {
+        return onError(err);
+      }
+      throw err;
+    }
+
+    p5Font.font = font;
+
+    if (typeof onSuccess !== 'undefined') {
+      onSuccess(p5Font);
+    }
+
+    if (decrementPreload && (onSuccess !== decrementPreload)) {
+      decrementPreload();
+    }
+
+    // check that we have an acceptable font type
+    var validFontTypes = [ 'ttf', 'otf', 'woff', 'woff2' ],
+      fileNoPath = path.split('\\').pop().split('/').pop(),
+      lastDotIdx = fileNoPath.lastIndexOf('.'), fontFamily, newStyle,
+      fileExt = lastDotIdx < 1 ? null : fileNoPath.substr(lastDotIdx + 1);
+
+    // if so, add it to the DOM (name-only) for use with p5.dom
+    if (validFontTypes.indexOf(fileExt) > -1) {
+
+      fontFamily = fileNoPath.substr(0, lastDotIdx);
+      newStyle = document.createElement('style');
+      newStyle.appendChild(document.createTextNode('\n@font-face {' +
+        '\nfont-family: ' + fontFamily + ';\nsrc: url(' + path + ');\n}\n'));
+      document.head.appendChild(newStyle);
+    }
+
+  });
+
+  return p5Font;
+};
+
+//BufferedReader
+p5.prototype.createInput = function () {
+  // TODO
+  throw 'not yet implemented';
+};
+
+p5.prototype.createReader = function () {
+  // TODO
+  throw 'not yet implemented';
+};
+
+p5.prototype.loadBytes = function () {
+  // TODO
+  throw 'not yet implemented';
+};
+
+/**
+ * Loads a JSON file from a file or a URL, and returns an Object or Array.
+ * This method is asynchronous, meaning it may not finish before the next
+ * line in your sketch is executed.
+ *
+ * @method loadJSON
+ * @param  {String}        path       name of the file or url to load
+ * @param  {Function}      [callback] function to be executed after
+ *                                    loadJSON() completes, data is passed
+ *                                    in as first argument
+ * @param  {Function}      [errorCallback] function to be executed if
+ *                                    there is an error, response is passed
+ *                                    in as first argument
+ * @param  {String}        [datatype] "json" or "jsonp"
+ * @return {Object|Array}             JSON data
+ * @example
+ *
+ * <p>Calling loadJSON() inside preload() guarantees to complete the
+ * operation before setup() and draw() are called.</p>
+ *
+ * <div><code>
+ * var weather;
+ * function preload() {
+ *   var url = 'http://api.openweathermap.org/data/2.5/weather?q=London,UK'+
+ *    '&APPID=7bbbb47522848e8b9c26ba35c226c734';
+ *   weather = loadJSON(url);
+ * }
+ *
+ * function setup() {
+ *   noLoop();
+ * }
+ *
+ * function draw() {
+ *   background(200);
+ *   // get the humidity value out of the loaded JSON
+ *   var humidity = weather.main.humidity;
+ *   fill(0, humidity); // use the humidity value to set the alpha
+ *   ellipse(width/2, height/2, 50, 50);
+ * }
+ * </code></div>
+ *
+ *
+ * <p>Outside of preload(), you may supply a callback function to handle the
+ * object:</p>
+ * <div><code>
+ * function setup() {
+ *   noLoop();
+ *   var url = 'http://api.openweathermap.org/data/2.5/weather?q=NewYork'+
+ *    '&APPID=7bbbb47522848e8b9c26ba35c226c734';
+ *   loadJSON(url, drawWeather);
+ * }
+ *
+ * function draw() {
+ *   background(200);
+ * }
+ *
+ * function drawWeather(weather) {
+ *   // get the humidity value out of the loaded JSON
+ *   var humidity = weather.main.humidity;
+ *   fill(0, humidity); // use the humidity value to set the alpha
+ *   ellipse(width/2, height/2, 50, 50);
+ * }
+ * </code></div>
+ *
+ */
+p5.prototype.loadJSON = function () {
+  var path = arguments[0];
+  var callback = arguments[1];
+  var errorCallback;
+  var decrementPreload = p5._getDecrementPreload.apply(this, arguments);
+
+  var ret = []; // array needed for preload
+  // assume jsonp for URLs
+  var t = 'json'; //= path.indexOf('http') === -1 ? 'json' : 'jsonp';
+
+  // check for explicit data type argument
+  for (var i = 2; i < arguments.length; i++) {
+    var arg = arguments[i];
+    if (typeof arg === 'string') {
+      if (arg === 'jsonp' || arg === 'json') {
+        t = arg;
+      }
+    } else if (typeof arg === 'function') {
+      errorCallback = arg;
+    }
+  }
+
+  reqwest({
+    url: path,
+    type: t,
+    crossOrigin: true,
+    error: function (resp) {
+      // pass to error callback if defined
+      if (errorCallback) {
+        errorCallback(resp);
+      } else { // otherwise log error msg
+        console.log(resp.statusText);
+      }
+    },
+    success: function (resp) {
+      for (var k in resp) {
+        ret[k] = resp[k];
+      }
+      if (typeof callback !== 'undefined') {
+        callback(resp);
+      }
+      if (decrementPreload && (callback !== decrementPreload)) {
+        decrementPreload();
+      }
+    }
+  });
+
+  return ret;
+};
+
+/**
+ * Reads the contents of a file and creates a String array of its individual
+ * lines. If the name of the file is used as the parameter, as in the above
+ * example, the file must be located in the sketch directory/folder.
+ * <br><br>
+ * Alternatively, the file maybe be loaded from anywhere on the local
+ * computer using an absolute path (something that starts with / on Unix and
+ * Linux, or a drive letter on Windows), or the filename parameter can be a
+ * URL for a file found on a network.
+ * <br><br>
+ * This method is asynchronous, meaning it may not finish before the next
+ * line in your sketch is executed.
+ *
+ * @method loadStrings
+ * @param  {String}   filename   name of the file or url to load
+ * @param  {Function} [callback] function to be executed after loadStrings()
+ *                               completes, Array is passed in as first
+ *                               argument
+ * @param  {Function} [errorCallback] function to be executed if
+ *                               there is an error, response is passed
+ *                               in as first argument
+ * @return {Array}               Array of Strings
+ * @example
+ *
+ * <p>Calling loadStrings() inside preload() guarantees to complete the
+ * operation before setup() and draw() are called.</p>
+ *
+ * <div><code>
+ * var result;
+ * function preload() {
+ *   result = loadStrings('assets/test.txt');
+ * }
+ * function setup() {
+ *   background(200);
+ *   var ind = floor(random(result.length));
+ *   text(result[ind], 10, 10, 80, 80);
+ * }
+ * </code></div>
+ *
+ * <p>Outside of preload(), you may supply a callback function to handle the
+ * object:</p>
+ *
+ * <div><code>
+ * function setup() {
+ *   loadStrings('assets/test.txt', pickString);
+ * }
+ *
+ * function pickString(result) {
+ *   background(200);
+ *   var ind = floor(random(result.length));
+ *   text(result[ind], 10, 10, 80, 80);
+ * }
+ * </code></div>
+ */
+p5.prototype.loadStrings = function (path, callback, errorCallback) {
+  var ret = [];
+  var req = new XMLHttpRequest();
+  var decrementPreload = p5._getDecrementPreload.apply(this, arguments);
+
+  req.addEventListener('error', function (resp) {
+    if (errorCallback) {
+      errorCallback(resp);
+    } else {
+      console.log(resp.responseText);
+    }
+  });
+
+  req.open('GET', path, true);
+  req.onreadystatechange = function () {
+    if (req.readyState === 4) {
+      if (req.status === 200) {
+        var arr = req.responseText.match(/[^\r\n]+/g);
+        for (var k in arr) {
+          ret[k] = arr[k];
+        }
+        if (typeof callback !== 'undefined') {
+          callback(ret);
+        }
+        if (decrementPreload && (callback !== decrementPreload)) {
+          decrementPreload();
+        }
+      } else {
+        if (errorCallback) {
+          errorCallback(req);
+        } else {
+          console.log(req.statusText);
+        }
+        //p5._friendlyFileLoadError(3, path);
+      }
+    }
+  };
+  req.send(null);
+  return ret;
+};
+
+/**
+ * <p>Reads the contents of a file or URL and creates a p5.Table object with
+ * its values. If a file is specified, it must be located in the sketch's
+ * "data" folder. The filename parameter can also be a URL to a file found
+ * online. By default, the file is assumed to be comma-separated (in CSV
+ * format). Table only looks for a header row if the 'header' option is
+ * included.</p>
+ *
+ * <p>Possible options include:
+ * <ul>
+ * <li>csv - parse the table as comma-separated values</li>
+ * <li>tsv - parse the table as tab-separated values</li>
+ * <li>header - this table has a header (title) row</li>
+ * </ul>
+ * </p>
+ *
+ * <p>When passing in multiple options, pass them in as separate parameters,
+ * seperated by commas. For example:
+ * <br><br>
+ * <code>
+ *   loadTable("my_csv_file.csv", "csv", "header")
+ * </code>
+ * </p>
+ *
+ * <p> All files loaded and saved use UTF-8 encoding.</p>
+ *
+ * <p>This method is asynchronous, meaning it may not finish before the next
+ * line in your sketch is executed. Calling loadTable() inside preload()
+ * guarantees to complete the operation before setup() and draw() are called.
+ * <p>Outside of preload(), you may supply a callback function to handle the
+ * object:</p>
+ * </p>
+ *
+ * @method loadTable
+ * @param  {String}         filename   name of the file or URL to load
+ * @param  {String|Strings} [options]  "header" "csv" "tsv"
+ * @param  {Function}       [callback] function to be executed after
+ *                                     loadTable() completes, Table object is
+ *                                     passed in as first argument
+ * @return {Object}                    Table object containing data
+ *
+ * @example
 
 
