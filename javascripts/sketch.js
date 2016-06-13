@@ -29,7 +29,7 @@ var tile_o;
  
  function createBoard(x,y){
  	var board = createCanvas(x,y);
- 	background(255)
+ 	background(0,255,255)
  	for (i = 0; i < 4; i++)
  	{
  		line((i*x)/3,0,(i*x)/3,y);
