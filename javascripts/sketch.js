@@ -1,4 +1,4 @@
- var tile_o;
+var tile_o;
  var tile_x;
  var player1_turn;
  var Ai_turn;
